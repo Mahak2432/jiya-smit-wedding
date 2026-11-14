@@ -1,0 +1,809 @@
+/*
+  The invitation story.
+  A camera walks along an illustrated palace colonnade. Each swipe pans to the next arch, the time
+  of day moves on (morning to moonlight), and that step's details settle into the sky.
+*/
+(function () {
+  'use strict';
+
+  var W = window.WEDDING;
+  var ART = window.ART;
+  if (!W || !ART) return;
+
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function esc(value) {
+    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function clamp(v, a, b) { return Math.max(a === undefined ? 0 : a, Math.min(b === undefined ? 1 : b, v)); }
+  function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  /* ----------------------------------------------------------
+     Times of day. Colours are what the guest finally sees; the sky
+     is pre-adjusted so it lands there under the night tint.
+     ---------------------------------------------------------- */
+  var MOODS = {
+    day:     { sky: ['#F7F2E9', '#F2ECE1', '#EBE0CF'], tint: ['#FFFFFF', 0],    sun: 0.85, stars: 0,    moon: 0, night: false },
+    dawn:    { sky: ['#F3E4E1', '#F6EADF', '#F3D9C4'], tint: ['#F4D6CF', 0.12], sun: 1,    stars: 0,    moon: 0, night: false },
+    morning: { sky: ['#EFF1EA', '#F6F0E3', '#F3E3C8'], tint: ['#FFF1D8', 0.08], sun: 1,    stars: 0,    moon: 0, night: false },
+    golden:  { sky: ['#F4DDBA', '#F1C595', '#E9A574'], tint: ['#F0AA6E', 0.27], sun: 1,    stars: 0,    moon: 0, night: false },
+    dusk:    { sky: ['#6E6C9C', '#C392A0', '#EEB28A'], tint: ['#7A689A', 0.34], sun: 0.3,  stars: 0.35, moon: 0, night: true },
+    night:   { sky: ['#151B3D', '#262C58', '#4B3F66'], tint: ['#2E356C', 0.6],  sun: 0,    stars: 1,    moon: 0, night: true },
+    moon:    { sky: ['#131939', '#242B58', '#473D65'], tint: ['#2E356C', 0.6],  sun: 0,    stars: 1,    moon: 1, night: true },
+  };
+
+  function hexToRgb(h) { var v = parseInt(h.slice(1), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; }
+  function rgbStr(c) { return 'rgb(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ')'; }
+  function mixRgb(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+
+  Object.keys(MOODS).forEach(function (k) {
+    var m = MOODS[k];
+    var tint = hexToRgb(m.tint[0]), a = m.tint[1];
+    m.tintRgb = tint;
+    m.skyRgb = m.sky.map(function (hex) {
+      var c = hexToRgb(hex);
+      return c.map(function (v, i) {
+        var f = 1 - a + a * tint[i] / 255;
+        return Math.min(255, v / f);
+      });
+    });
+  });
+
+  /* ----------------------------------------------------------
+     Scene content
+     ---------------------------------------------------------- */
+  var ORN = '<div class="orn rv" aria-hidden="true"><i></i></div>';
+  function hi(cls, text) { return '<p class="' + cls + ' rv" lang="hi">' + esc(text) + '</p>'; }
+  function p(cls, text) { return '<p class="' + cls + ' rv">' + esc(text) + '</p>'; }
+  var bride = W.couple.bride, groom = W.couple.groom;
+
+  function sceneHero() {
+    return '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>' +
+      '<p class="std rv">Save <span class="the">the</span> Date</p>' +
+      p('caps-sm gap-sm', 'To celebrate the wedding of') +
+      '<h2 class="names rv" aria-label="' + esc(bride.name + ' and ' + groom.name) + '">' + esc(bride.name) + ' <span class="amp">&amp;</span> ' + esc(groom.name) + '</h2>' +
+      p('caps', W.wedding.dateLine) +
+      p('caps-sm', W.wedding.venue + ', ' + W.wedding.city.split(',')[0]);
+  }
+
+  function sceneBlessing() {
+    var B = W.blessing;
+    return '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>' +
+      hi('hi-title', B.hindi) +
+      ORN +
+      B.shloka.map(function (line) { return hi('hi-verse', line); }).join('') +
+      p('en-it gap-sm', B.shlokaEn) +
+      ORN +
+      hi('hi-quote', W.invitation.quote);
+  }
+
+  // The invitation itself unrolls on a paper scroll hanging in the arch.
+  function sceneInvitation() {
+    var I = W.invitation;
+    return '<div class="scroll rv">' +
+        '<div class="scroll-rod"></div>' +
+        '<div class="scroll-body"><div class="scroll-paper">' +
+          hi('hi-label', I.salutation) +
+          hi('hi-body gap-sm', I.hindi) +
+          ORN +
+          p('en-it', I.english) +
+        '</div></div>' +
+        '<div class="scroll-rod"></div>' +
+      '</div>';
+  }
+
+  function sceneFamily(f, person, extra) {
+    return hi('hi-label', f.side) +
+      '<h2 class="script rv">' + esc(person.name) + '</h2>' +
+      hi('hi-name', f.nameHindi) +
+      ORN +
+      f.lines.map(function (line) { return p('en', line); }).join('') +
+      p('caps-sm gap', f.firm) +
+      (extra || '');
+  }
+
+  function sceneDay(d) {
+    var rows = d.events.map(function (ev) {
+      return '<li class="ev rv' + (ev.main ? ' is-main' : '') + '">' +
+        '<time>' + esc(ev.time) + '</time>' +
+        '<span class="ev-hi" lang="hi">' + esc(ev.hindi) + '</span>' +
+        '<span class="ev-en">' + esc(ev.english) + '</span>' +
+      '</li>';
+    }).join('');
+    return p('caps-sm', d.weekday) +
+      '<p class="day-num rv">' + esc(d.day) + '</p>' +
+      p('caps', d.month) +
+      p('place', d.place) +
+      ORN +
+      '<ol class="events">' + rows + '</ol>';
+  }
+
+  function sceneVenue() {
+    var units = [['days', 'Days'], ['hours', 'Hours'], ['minutes', 'Mins'], ['seconds', 'Secs']].map(function (u) {
+      return '<div><strong data-unit="' + u[0] + '">00</strong><span>' + u[1] + '</span></div>';
+    }).join('');
+    return hi('hi-label', 'निमंत्रित स्थल') +
+      '<h2 class="script rv">' + esc(W.wedding.venue) + '</h2>' +
+      p('caps-sm', W.wedding.city) +
+      ORN +
+      '<div class="count rv" id="count" role="timer" aria-label="Time until the Ashirwad Samaroh">' + units + '</div>' +
+      '<p class="en-it rv" id="count-done" hidden>The celebration has begun</p>' +
+      p('en-it', 'until the Ashirwad Samaroh, 7:15 PM on 12 December') +
+      '<div class="pills rv">' +
+        '<a class="pill" href="' + esc(W.wedding.mapUrl) + '" target="_blank" rel="noopener">Open in maps</a>' +
+        '<button class="pill" id="save-dates" type="button">Save the dates</button>' +
+      '</div>';
+  }
+
+  function sceneGreetings() {
+    var G = W.guests;
+    function block(group, gloss, inline) {
+      return '<div class="gblock rv">' +
+        '<p class="hi-label" lang="hi">' + esc(group.hindi) + '</p>' +
+        '<p class="gloss">' + esc(gloss) + '</p>' +
+        (inline
+          ? '<p class="gline">' + esc(group.names.join(', ')) + '</p>'
+          : '<ul class="glist">' + group.names.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>') +
+      '</div>';
+    }
+    return block(G.darshan, 'Looking forward to seeing you') +
+      block(G.special, 'With a special request') +
+      block(G.sweet, 'A sweet invitation from', true) +
+      p('en-sm gap', G.ladies);
+  }
+
+  function sceneClosing() {
+    var C = W.closing;
+    var calls = W.contacts.map(function (c) {
+      return '<a class="pill" href="tel:' + esc(c.tel) + '">Call ' + esc(c.display) + '</a>';
+    }).join('');
+    var whatsapp = W.contacts[0]
+      ? '<a class="pill" href="https://wa.me/' + esc(W.contacts[0].wa) + '?text=' +
+          encodeURIComponent('Namaste, we will be happy to join the wedding of ' + bride.name + ' & ' + groom.name + '.') +
+          '" target="_blank" rel="noopener">WhatsApp</a>'
+      : '';
+    return hi('hi-title', C.hindi) +
+      '<p class="script-md rv">' + esc(C.english) + '</p>' +
+      hi('hi-sign gap', C.signedHindi) +
+      p('en-sm', C.signedEnglish) +
+      '<div class="pills rv">' + calls + whatsapp + '</div>' +
+      '<button class="text-btn rv" id="replay" type="button">Watch again</button>';
+  }
+
+  var M = W.families.maternal;
+  var nanihal = p('en-sm gap-sm', M.label + ': ' + M.names);
+
+  var PR = ART.props;
+  var SLIDES = [
+    { id: 'save-the-date', label: 'Save the date', mood: 'day', box: [150, 270, 850, 905], html: sceneHero,
+      props: function () { return { arch: PR.peacock(200, 1566, 1.05, true) + PR.couple(560, 1552, 0.98) }; } },
+    { id: 'blessing', label: 'Shri Ganesh', mood: 'dawn', box: [180, 290, 820, 1130], html: sceneBlessing,
+      props: function () { return { arch: PR.bells() }; } },
+    { id: 'invitation', label: 'Invitation', mood: 'day', box: [120, 350, 880, 1520], top: true, html: sceneInvitation,
+      props: function () { return { arch: '' }; } },
+    { id: 'bride', label: "The bride's family", mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.bride, bride, nanihal); },
+      props: function () { return { arch: PR.peacock(205, 1566, 1, true) }; } },
+    { id: 'groom', label: "The groom's family", mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.groom, groom); },
+      props: function () { return { arch: PR.peacock(795, 1566, 1, false) }; } },
+    { id: 'day-1', label: '9 December', mood: 'morning', box: [185, 280, 815, 1060], html: function () { return sceneDay(W.days[0]); },
+      props: function () { return { arch: PR.marigolds() }; } },
+    { id: 'day-2', label: '11 December', mood: 'golden', box: [185, 300, 815, 1130], html: function () { return sceneDay(W.days[1]); },
+      props: function () { return { arch: PR.marigolds() + PR.peacock(205, 1566, 1, true) }; } },
+    { id: 'day-3', label: '12 December', mood: 'dusk', box: [185, 300, 815, 1130], html: function () { return sceneDay(W.days[2]); },
+      props: function () { return { glow: PR.lanterns() }; } },
+    { id: 'venue', label: 'Venue and countdown', mood: 'night', box: [170, 300, 830, 1130], html: sceneVenue,
+      props: function () { return { glow: PR.lanterns() + PR.diyas() }; } },
+    { id: 'family', label: 'With love', mood: 'night', box: [170, 290, 830, 1190], html: sceneGreetings,
+      props: function () { return { glow: PR.lanterns() + PR.diyas() }; } },
+    { id: 'rsvp', label: 'Awaiting you', mood: 'moon', box: [150, 392, 850, 990], html: sceneClosing,
+      props: function () { return { arch: PR.couple(520, 1552, 0.86), glow: PR.diyas([150, 250, 760, 860]) }; } },
+  ];
+  var N = SLIDES.length;
+
+  /* ----------------------------------------------------------
+     Build
+     ---------------------------------------------------------- */
+  var story = $('#story');
+  var world = $('#world');
+  var skyEl = $('#sky');
+  var tintEl = $('#tint');
+  var crestEl = $('#crest');
+  var panelsEl = $('#panels');
+  var progressEl = $('#progress');
+  var cover = $('#cover');
+  var hint = $('#hint');
+  var statusEl = $('#status');
+  var prevBtn = $('#prev');
+  var nextBtn = $('#next');
+  var musicBtn = $('#music');
+  var canvas = $('#flock');
+  var ctx = canvas.getContext('2d');
+
+  $('#l-sky').innerHTML = ART.sky();
+  $('#l-far').innerHTML = ART.far();
+  $('#l-garden').innerHTML = ART.garden();
+  $('#l-bal').innerHTML = ART.balustrade();
+  $('#l-arch').innerHTML = ART.arch();
+  $('#l-stars').innerHTML = ART.stars();
+  $('#l-glow').innerHTML = ART.glowLayer();
+  crestEl.innerHTML = ART.crest(bride.name, groom.name);
+
+  var MOVING = $$('.layer[data-p]').map(function (el) { return { el: el, p: parseFloat(el.dataset.p) }; });
+  var FIXED = $$('.layer--fixed');
+  var sunEl = $('#l-sky .sun');
+  var starsEl = $('#l-stars .stars');
+  var moonEl = $('#l-stars .moon');
+  var skyClip = $('#sky-clip-path');
+  var archSlots = {}, glowSlots = {};
+  $$('#l-arch .slot').forEach(function (g) { archSlots[g.getAttribute('data-slot')] = g; });
+  $$('#l-glow .slot').forEach(function (g) { glowSlots[g.getAttribute('data-slot')] = g; });
+
+  panelsEl.innerHTML = SLIDES.map(function (s, i) {
+    var night = MOODS[s.mood].night;
+    return '<section class="panel' + (night ? ' is-night' : '') + (s.top ? ' panel--top' : '') + '" style="--l:' + s.box[0] + ';--t:' + s.box[1] + ';--r:' + s.box[2] + ';--b:' + s.box[3] + '"' +
+      ' role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' of ' + N + ': ' + esc(s.label) + '" aria-hidden="true">' +
+      s.html() + '</section>';
+  }).join('');
+  var panels = $$('.panel', panelsEl);
+  panels.forEach(function (el) {
+    $$('.rv', el).forEach(function (line, k) { line.style.setProperty('--i', k); });
+    el.inert = true;
+  });
+
+  progressEl.innerHTML = SLIDES.map(function () { return '<span class="seg"><i></i></span>'; }).join('');
+  var segs = $$('.seg', progressEl);
+
+  /* ----------------------------------------------------------
+     Layout: map bay units to pixels for this screen
+     ---------------------------------------------------------- */
+  var U = 1, OX = 0, OY = 0, CW = 0, CH = 0, DPR = 1;
+  var ZOOM = 3.4, ZOOM_Y = 698;
+
+  function layout() {
+    var r = story.getBoundingClientRect();
+    CW = r.width; CH = r.height;
+    U = Math.max(CW / 1000, CH / 1900);
+    OX = (CW - 1000 * U) / 2;
+    OY = (CH - 1900 * U) / 2;
+    story.style.setProperty('--u', U + 'px');
+    story.style.setProperty('--ox', OX + 'px');
+    story.style.setProperty('--oy', OY + 'px');
+    MOVING.forEach(function (L) {
+      L.el.style.width = 3000 * U + 'px';
+      L.el.style.height = 1900 * U + 'px';
+      L.el.style.left = (OX - 1000 * U) + 'px';
+      L.el.style.top = OY + 'px';
+    });
+    FIXED.forEach(function (el) {
+      el.style.width = 1000 * U + 'px';
+      el.style.height = 1900 * U + 'px';
+      el.style.left = OX + 'px';
+      el.style.top = OY + 'px';
+    });
+    var origin = (OX + 500 * U) + 'px ' + (OY + ZOOM_Y * U) + 'px';
+    world.style.transformOrigin = origin;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(CW * DPR);
+    canvas.height = Math.round(CH * DPR);
+    if (pan) renderPan(pan.e);
+  }
+
+  /* ----------------------------------------------------------
+     Mood (time of day)
+     ---------------------------------------------------------- */
+  function applyMood(a, b, t) {
+    var A = MOODS[a], B = MOODS[b || a];
+    t = b ? t : 0;
+    var s0 = mixRgb(A.skyRgb[0], B.skyRgb[0], t), s1 = mixRgb(A.skyRgb[1], B.skyRgb[1], t), s2 = mixRgb(A.skyRgb[2], B.skyRgb[2], t);
+    skyEl.style.background = 'linear-gradient(' + rgbStr(s0) + ', ' + rgbStr(s1) + ' 50%, ' + rgbStr(s2) + ' 68%)';
+    tintEl.style.background = rgbStr(mixRgb(A.tintRgb, B.tintRgb, t));
+    tintEl.style.opacity = A.tint[1] + (B.tint[1] - A.tint[1]) * t;
+    sunEl.style.opacity = A.sun + (B.sun - A.sun) * t;
+    starsEl.style.opacity = A.stars + (B.stars - A.stars) * t;
+    moonEl.style.opacity = A.moon + (B.moon - A.moon) * t;
+    var night = (t < 0.5 ? A : B).night;
+    story.classList.toggle('is-night', night);
+    document.body.classList.toggle('is-night', night);
+  }
+
+  /* ----------------------------------------------------------
+     Props for each scene live in "slots": the bay on screen and
+     the bays either side, used while the camera pans.
+     ---------------------------------------------------------- */
+  function fillSlot(k, i) {
+    var pr = i >= 0 && i < N ? SLIDES[i].props() : {};
+    archSlots[k].innerHTML = pr.arch || '';
+    glowSlots[k].innerHTML = pr.glow || '';
+  }
+
+  /* ----------------------------------------------------------
+     Navigation
+     ---------------------------------------------------------- */
+  var cur = -1;
+  var opened = false;
+  var moved = false;
+  var pan = null;
+  var intro = null;
+
+  function setPanel(i, state) {
+    var el = panels[i];
+    if (!el) return;
+    el.style.transform = '';
+    el.style.opacity = state === 'off' ? '' : '1';
+    el.classList.toggle('is-shown', state !== 'off');
+    el.classList.toggle('is-active', state === 'active');
+    el.inert = state !== 'active';
+    el.setAttribute('aria-hidden', state === 'active' ? 'false' : 'true');
+  }
+
+  function updateChrome(i) {
+    segs.forEach(function (seg, k) {
+      seg.classList.toggle('is-done', k < i);
+      seg.classList.remove('is-current');
+    });
+    void segs[i].offsetWidth;
+    segs[i].classList.add('is-current');
+    statusEl.textContent = 'Step ' + (i + 1) + ' of ' + N + ': ' + SLIDES[i].label;
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === N - 1;
+    try { history.replaceState(null, '', '#' + SLIDES[i].id); } catch (e) { /* some in-app browsers block this */ }
+  }
+
+  // Put scene i on screen with nothing moving.
+  function settle(i, showText) {
+    cur = i;
+    MOVING.forEach(function (L) { L.el.style.transform = ''; });
+    skyClip.removeAttribute('transform');
+    fillSlot('0', i);
+    fillSlot('-1', -1);
+    fillSlot('1', -1);
+    applyMood(SLIDES[i].mood);
+    panels.forEach(function (el, k) { if (k !== i) setPanel(k, 'off'); });
+    if (showText !== false) setPanel(i, 'active');
+    updateChrome(i);
+  }
+
+  function renderPan(e) {
+    var off = -pan.dir * e * 1000;
+    MOVING.forEach(function (L) { L.el.style.transform = 'translate3d(' + (off * L.p * U) + 'px,0,0)'; });
+    skyClip.setAttribute('transform', 'translate(' + off + ' 0)');
+    applyMood(SLIDES[pan.from].mood, SLIDES[pan.to].mood, e);
+    var out = panels[pan.from], inn = panels[pan.to];
+    out.style.transform = 'translate3d(' + (off * U) + 'px,0,0)';
+    out.style.opacity = clamp(1 - e * 2.6);
+    inn.style.transform = 'translate3d(' + ((off + pan.dir * 1000) * U) + 'px,0,0)';
+    inn.style.opacity = clamp((e - 0.35) / 0.5);
+  }
+
+  function frame(now) {
+    if (!pan) return;
+    var t = clamp((now - pan.t0) / pan.dur);
+    pan.e = easeInOut(t);
+    renderPan(pan.e);
+    if (t > 0.5 && !pan.revealed) {
+      pan.revealed = true;
+      panels[pan.to].classList.add('is-active');
+    }
+    if (t < 1) pan.raf = requestAnimationFrame(frame);
+    else endPan();
+  }
+
+  function endPan() {
+    if (!pan) return;
+    cancelAnimationFrame(pan.raf);
+    var to = pan.to;
+    pan = null;
+    settle(to);
+  }
+
+  function go(i) {
+    if (i < 0 || i >= N || i === cur) return;
+    if (pan) endPan();
+    if (intro) finishIntro();
+    if (cur < 0 || reduced) { settle(i); return; }
+    var dir = i > cur ? 1 : -1;
+    fillSlot(String(dir), i);
+    var inn = panels[i];
+    inn.classList.add('is-shown');
+    inn.classList.remove('is-active');
+    inn.inert = false;
+    inn.setAttribute('aria-hidden', 'false');
+    panels[cur].inert = true;
+    panels[cur].setAttribute('aria-hidden', 'true');
+    pan = { from: cur, to: i, dir: dir, t0: performance.now(), dur: 1500, e: 0, revealed: false };
+    renderPan(0);
+    pan.raf = requestAnimationFrame(frame);
+    updateChrome(i);
+    hint.classList.remove('is-on');
+  }
+
+  function step(delta) {
+    if (!opened) return;
+    if (intro) { finishIntro(); return; }
+    moved = true;
+    hint.classList.remove('is-on');
+    go((pan ? pan.to : cur) + delta);
+  }
+
+  /* ----------------------------------------------------------
+     Opening: the camera pulls back from the monogram to the palace,
+     butterflies gather into a heart, and the couple walks in.
+     ---------------------------------------------------------- */
+  var startIndex = 0;
+  SLIDES.forEach(function (s, i) { if (location.hash === '#' + s.id) startIndex = i; });
+
+  function setZoom(scale, animate) {
+    var tr = animate ? 'transform 2.9s cubic-bezier(.5, 0, .15, 1)' : 'none';
+    world.style.transition = tr;
+    crestEl.style.transition = animate ? tr + ', opacity 1.5s ease 0.7s' : 'none';
+    world.style.transform = 'scale(' + scale + ')';
+    crestEl.style.transform = 'scale(' + (scale / ZOOM) + ')';
+  }
+
+  function openInvite() {
+    if (opened) return;
+    opened = true;
+    story.classList.add('is-open');
+    document.body.classList.add('is-open');
+    playMusic();
+    settle(startIndex, false);
+    if (reduced) {
+      setZoom(1, false);
+      crestEl.style.opacity = 0;
+      setPanel(startIndex, 'active');
+      return;
+    }
+    void world.offsetWidth;
+    setZoom(1, true);
+    crestEl.style.opacity = 0;
+    var t0 = performance.now();
+    intro = { t0: t0, hero: startIndex === 0, timers: [] };
+    if (intro.hero) {
+      prepareWalk();
+      startFlock(t0 + 1300);
+      intro.timers.push(setTimeout(function () { startWalk(); }, 4300));
+      intro.timers.push(setTimeout(revealHero, 6900));
+    } else {
+      intro.timers.push(setTimeout(revealHero, 2300));
+    }
+  }
+
+  function revealHero() {
+    if (!intro) return;
+    intro.timers.forEach(clearTimeout);
+    intro = null;
+    setPanel(cur, 'active');
+    if (!moved && cur === 0) setTimeout(function () { if (!moved && cur === 0) hint.classList.add('is-on'); }, 2600);
+  }
+
+  function finishIntro() {
+    if (!intro) return;
+    setZoom(1, false);
+    stopFlock();
+    finishWalk();
+    revealHero();
+  }
+
+  /* Couple walk */
+  var walk = null;
+  var WALK_FROM = 680;
+
+  function coupleParts() {
+    var g = $('#l-arch .slot[data-slot="0"] .couple');
+    if (!g) return null;
+    return {
+      g: g,
+      body: $('.couple-body', g),
+      legF: $('.leg--f', g),
+      legB: $('.leg--b', g),
+      skirt: $('.skirt', g),
+      base: g.getAttribute('transform'),
+    };
+  }
+
+  function placeCouple(parts, dx, phase, amp) {
+    var m = /translate\(([-\d.]+) ([-\d.]+)\) scale\(([-\d.]+)\)/.exec(parts.base);
+    var x = parseFloat(m[1]) + dx, y = parseFloat(m[2]), sc = m[3];
+    parts.g.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y + ') scale(' + sc + ')');
+    var swing = Math.sin(phase) * 15 * amp;
+    parts.legF.setAttribute('transform', 'rotate(' + swing.toFixed(2) + ' 72 -330)');
+    parts.legB.setAttribute('transform', 'rotate(' + (-swing).toFixed(2) + ' 78 -330)');
+    parts.body.setAttribute('transform', 'translate(0 ' + (-Math.abs(Math.sin(phase)) * 6 * amp).toFixed(2) + ')');
+    parts.skirt.setAttribute('transform', 'skewX(' + (Math.sin(phase) * 2.6 * amp).toFixed(2) + ')');
+  }
+
+  function prepareWalk() {
+    var parts = coupleParts();
+    if (!parts) return;
+    walk = { parts: parts, done: false };
+    placeCouple(parts, WALK_FROM, 0, 0);
+  }
+
+  function startWalk() {
+    if (!walk) return;
+    var t0 = performance.now(), dur = 3900;
+    function tick(now) {
+      if (!walk || walk.done) return;
+      var t = clamp((now - t0) / dur);
+      var e = 1 - Math.pow(1 - t, 1.7);
+      var dist = WALK_FROM * (1 - e);
+      var phase = (WALK_FROM - dist) / 34;
+      placeCouple(walk.parts, dist, phase, t < 0.86 ? 1 : (1 - t) / 0.14);
+      if (t < 1) walk.raf = requestAnimationFrame(tick);
+      else finishWalk();
+    }
+    walk.raf = requestAnimationFrame(tick);
+  }
+
+  function finishWalk() {
+    if (!walk) return;
+    cancelAnimationFrame(walk.raf);
+    placeCouple(walk.parts, 0, 0, 0);
+    walk.done = true;
+    walk = null;
+  }
+
+  /* Butterflies gathering into a heart */
+  var flock = null;
+
+  function startFlock(at) {
+    var birds = [], count = 64;
+    for (var k = 0; k < count; k++) {
+      var t = k / count * Math.PI * 2;
+      var hx = 16 * Math.pow(Math.sin(t), 3);
+      var hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      var tx = 500 + hx * 13.5 + (Math.random() - 0.5) * 10;
+      var ty = 600 - hy * 13.5 + (Math.random() - 0.5) * 10;
+      var sx = -160 - Math.random() * 360, sy = 330 + Math.random() * 560;
+      birds.push({
+        s: [sx, sy], c: [sx + 380 + Math.random() * 200, sy - 260 + Math.random() * 200], t: [tx, ty],
+        e: [1180 + Math.random() * 300, 120 + Math.random() * 420],
+        arrive: 2.1 + (k / count) * 0.7 + Math.random() * 0.35,
+        leave: 4.7 + Math.random() * 0.5,
+        hue: Math.random(),
+        size: 0.8 + Math.random() * 0.45,
+        flap: 9 + Math.random() * 5,
+        ph: Math.random() * 6,
+      });
+    }
+    flock = { birds: birds, t0: at, raf: 0 };
+    flock.raf = requestAnimationFrame(drawFlock);
+  }
+
+  function stopFlock() {
+    if (!flock) return;
+    cancelAnimationFrame(flock.raf);
+    flock = null;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function bez(a, b, c, t) { var u = 1 - t; return [u * u * a[0] + 2 * u * t * b[0] + t * t * c[0], u * u * a[1] + 2 * u * t * b[1] + t * t * c[1]]; }
+
+  function drawFlock(now) {
+    if (!flock) return;
+    var t = (now - flock.t0) / 1000;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (t < 0) { flock.raf = requestAnimationFrame(drawFlock); return; }
+    var alive = false;
+    flock.birds.forEach(function (b) {
+      var pos, prev;
+      if (t < b.arrive) {
+        var q = easeInOut(clamp(t / b.arrive));
+        pos = bez(b.s, b.c, b.t, q);
+        prev = bez(b.s, b.c, b.t, Math.max(0, q - 0.02));
+      } else if (t < b.leave) {
+        var w = t - b.arrive;
+        pos = [b.t[0] + Math.sin(w * 2 + b.ph) * 4, b.t[1] + Math.cos(w * 2.6 + b.ph) * 4];
+        prev = [pos[0] - 1, pos[1]];
+      } else {
+        var r = clamp((t - b.leave) / 2.2);
+        var q2 = r * r;
+        var mid = [b.t[0] + 140, b.t[1] - 160];
+        pos = bez(b.t, mid, b.e, q2);
+        prev = bez(b.t, mid, b.e, Math.max(0, q2 - 0.02));
+        if (r >= 1) return;
+      }
+      alive = true;
+      var x = (OX + pos[0] * U) * DPR, y = (OY + pos[1] * U) * DPR;
+      var ang = Math.atan2(pos[1] - prev[1], pos[0] - prev[0]) * 0.25;
+      var flap = Math.abs(Math.sin(t * b.flap + b.ph));
+      var s = b.size * U * DPR;
+      ctx.setTransform(1, 0, 0, 1, x, y);
+      ctx.rotate(ang);
+      ctx.fillStyle = b.hue > 0.5 ? '#C9839B' : '#DDA0B4';
+      ctx.beginPath();
+      ctx.ellipse(-5 * s * (0.3 + 0.7 * flap), -4 * s, 6 * s * (0.3 + 0.7 * flap), 7 * s, -0.5, 0, Math.PI * 2);
+      ctx.ellipse(5 * s * (0.3 + 0.7 * flap), -4 * s, 6 * s * (0.3 + 0.7 * flap), 7 * s, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = b.hue > 0.5 ? '#E7B9C7' : '#B76F88';
+      ctx.beginPath();
+      ctx.ellipse(-4 * s * (0.3 + 0.7 * flap), 4 * s, 4 * s * (0.3 + 0.7 * flap), 4.5 * s, 0.4, 0, Math.PI * 2);
+      ctx.ellipse(4 * s * (0.3 + 0.7 * flap), 4 * s, 4 * s * (0.3 + 0.7 * flap), 4.5 * s, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#5A3B42';
+      ctx.fillRect(-1 * s, -7 * s, 2 * s, 14 * s);
+    });
+    if (alive) flock.raf = requestAnimationFrame(drawFlock);
+    else stopFlock();
+  }
+
+  /* ----------------------------------------------------------
+     Music
+     ---------------------------------------------------------- */
+  var audio = null;
+  var wasPlaying = false;
+
+  function setMusicUI(playing) {
+    musicBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    musicBtn.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+  }
+
+  try {
+    audio = new Audio(W.music.src);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.volume = 0.55;
+    audio.addEventListener('error', function () { audio = null; musicBtn.hidden = true; });
+    audio.addEventListener('play', function () { setMusicUI(true); });
+    audio.addEventListener('pause', function () { setMusicUI(false); });
+    musicBtn.hidden = false;
+  } catch (e) {
+    audio = null;
+    musicBtn.hidden = true;
+  }
+
+  function playMusic() {
+    if (!audio) return;
+    var pr = audio.play();
+    if (pr && pr.catch) pr.catch(function () { setMusicUI(false); });
+  }
+
+  musicBtn.addEventListener('click', function () {
+    if (!audio) return;
+    if (audio.paused) playMusic(); else audio.pause();
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (!audio) return;
+    if (document.hidden) { wasPlaying = !audio.paused; audio.pause(); }
+    else if (wasPlaying) playMusic();
+  });
+
+  /* ----------------------------------------------------------
+     Countdown
+     ---------------------------------------------------------- */
+  var target = new Date(W.wedding.startsAt).getTime();
+
+  function tick() {
+    var box = $('#count');
+    if (!box) return;
+    var diff = target - Date.now();
+    if (diff <= 0) {
+      box.hidden = true;
+      var done = $('#count-done');
+      if (done) done.hidden = false;
+      return;
+    }
+    $('[data-unit="days"]', box).textContent = pad(Math.floor(diff / 86400000));
+    $('[data-unit="hours"]', box).textContent = pad(Math.floor(diff / 3600000) % 24);
+    $('[data-unit="minutes"]', box).textContent = pad(Math.floor(diff / 60000) % 60);
+    $('[data-unit="seconds"]', box).textContent = pad(Math.floor(diff / 1000) % 60);
+  }
+
+  /* ----------------------------------------------------------
+     Calendar (.ics) download
+     ---------------------------------------------------------- */
+  function icsStamp(date) { return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'); }
+  function icsText(v) { return String(v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n'); }
+  function icsLine(line) {
+    if (line.length <= 73) return line;
+    var parts = [];
+    for (var i = 0; i < line.length; i += 73) parts.push(line.slice(i, i + 73));
+    return parts.join('\r\n ');
+  }
+
+  function buildICS() {
+    var now = icsStamp(new Date());
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Shubh Vivah//Wedding Invitation//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+    W.days.forEach(function (day) {
+      day.events.forEach(function (ev, k) {
+        var start = new Date(ev.startsAt);
+        var end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+        lines.push(
+          'BEGIN:VEVENT',
+          'UID:' + ev.startsAt.replace(/[^0-9]/g, '') + '-' + k + '@shubh-vivah',
+          'DTSTAMP:' + now,
+          'DTSTART:' + icsStamp(start),
+          'DTEND:' + icsStamp(end),
+          'SUMMARY:' + icsText(bride.name + ' & ' + groom.name + ': ' + ev.english),
+          'LOCATION:' + icsText(day.place),
+          'DESCRIPTION:' + icsText('Shubh Vivah wedding celebration. All times IST.'),
+          'END:VEVENT'
+        );
+      });
+    });
+    lines.push('END:VCALENDAR');
+    return lines.map(icsLine).join('\r\n');
+  }
+
+  function downloadICS() {
+    var blob = new Blob([buildICS()], { type: 'text/calendar;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'jiya-smit-wedding.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ----------------------------------------------------------
+     Input
+     ---------------------------------------------------------- */
+  $('#open').addEventListener('click', openInvite);
+  prevBtn.addEventListener('click', function () { step(-1); });
+  nextBtn.addEventListener('click', function () { step(1); });
+
+  panelsEl.addEventListener('click', function (e) {
+    if (e.target.closest('#save-dates')) downloadICS();
+    if (e.target.closest('#replay')) { moved = true; go(0); }
+  });
+
+  // Swipe in any direction, or tap: the left third goes back, the rest goes forward.
+  var sx = 0, sy = 0, st = 0, tracking = false;
+  story.addEventListener('pointerdown', function (e) {
+    if (!opened || e.target.closest('a, button')) return;
+    tracking = true;
+    sx = e.clientX; sy = e.clientY; st = Date.now();
+  });
+  story.addEventListener('pointerup', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var dx = e.clientX - sx, dy = e.clientY - sy, ax = Math.abs(dx), ay = Math.abs(dy);
+    if (ax > 40 || ay > 40) {
+      if (ax > ay) step(dx < 0 ? 1 : -1);
+      else step(dy < 0 ? 1 : -1);
+      return;
+    }
+    if (Date.now() - st < 600) {
+      var r = story.getBoundingClientRect();
+      step(e.clientX - r.left < r.width * 0.3 ? -1 : 1);
+    }
+  });
+  story.addEventListener('pointercancel', function () { tracking = false; });
+
+  var wheelLock = 0;
+  window.addEventListener('wheel', function (e) {
+    if (!opened || Math.abs(e.deltaY) < 20) return;
+    var now = Date.now();
+    if (now < wheelLock) return;
+    wheelLock = now + 1100;
+    step(e.deltaY > 0 ? 1 : -1);
+  }, { passive: true });
+
+  document.addEventListener('keydown', function (e) {
+    if (!opened) {
+      if (e.key === 'Enter' && document.activeElement === document.body) openInvite();
+      return;
+    }
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); step(1); }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); step(-1); }
+  });
+
+  window.addEventListener('resize', layout);
+
+  /* ----------------------------------------------------------
+     Start on the cover
+     ---------------------------------------------------------- */
+  layout();
+  applyMood(SLIDES[startIndex].mood);
+  setZoom(ZOOM, false);
+  tick();
+  setInterval(tick, 1000);
+})();

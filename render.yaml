@@ -1,0 +1,12 @@
+# Render Blueprint: deploys this folder as a free static site.
+# In Render: New > Blueprint > connect your GitHub repo. If this folder is inside a bigger repo,
+# set "Root Directory" to wedding-invitation.
+services:
+  - type: web
+    name: jiya-smit-wedding
+    runtime: static
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=300
