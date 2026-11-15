@@ -54,9 +54,9 @@
   });
 
   /* ----------------------------------------------------------
-     Language. The invitation opens in English; guests can switch to Hindi
+     Language. The invitation opens in Hindi; guests can switch to English
      from the EN / हिं switch in the top bar, and a shared link can start in
-     Hindi with ?lang=hi.
+     English with ?lang=en.
      ---------------------------------------------------------- */
   var UI = {
     en: {
@@ -85,7 +85,7 @@
       labels: ['शुभ विवाह', 'श्री गणेश', 'निमंत्रण', 'वधु पक्ष', 'वर पक्ष', '9 दिसम्बर', '11 दिसम्बर', '12 दिसम्बर', 'निमंत्रित स्थल', 'स्नेह सहित', 'आपकी प्रतीक्षा में'],
     },
   };
-  var LANG = /[?&]lang=hi\b/.test(location.search) ? 'hi' : 'en';
+  var LANG = /[?&]lang=en\b/.test(location.search) ? 'en' : 'hi';
   function L(v) { return v && typeof v === 'object' && !Array.isArray(v) ? (v[LANG] !== undefined ? v[LANG] : v.en) : v; }
   function T(key) { return UI[LANG][key]; }
 
