@@ -43,7 +43,7 @@ window.WEDDING = {
   invitation: {
     salutation: { en: "Dear family and friends,", hi: "स्नेहिल स्वजन," },
     body: {
-      en: "With the boundless grace of the Almighty and the blessings of Smt. Munni Devi and Sh. Satyanarayan Shah, we joyfully invite you to the wedding of their granddaughter Jeeya with Smit. Amid our traditions, the blessings of our ancestors and the witness of the sacred fire, your loving presence and blessings at every ceremony would mean the world to us.",
+      en: "With the boundless grace of the Almighty and the blessings of Mrs. Munni Devi and Mr. Satyanarayan Shah, we joyfully invite you to the wedding of their granddaughter Jeeya with Smit. Amid our traditions, the blessings of our ancestors and the witness of the sacred fire, your loving presence and blessings at every ceremony would mean the world to us.",
       hi: "परमपिता परमेश्वर की असीम अनुकम्पा से श्रीमती मुन्नी देवी एवं सत्यनारायण शाह के शुभाशीर्वाद से अपनी सुपौत्री आयुष्मती जिया संग आयुष्मान् स्मित के मंगल परिणयोत्सव की सांस्कृतिक परम्परा, पूर्वजों के आशीर्वाद, अग्नि के साक्ष्य, आमंत्रितों की शुभकामनाओं एवं स्वागत सत्कार की सुमधुर मंगल वेला में आयोजित सभी कार्यक्रमों में आपकी स्नेहमयी उपस्थिति एवं आशीर्वाद हेतु आपको सादर आमंत्रित करते हैं।",
     },
   },
@@ -53,7 +53,7 @@ window.WEDDING = {
       side: { en: "The bride", hi: "वधु पक्ष" },
       title: { en: "Jeeya", hi: "आयुष्मती जिया" },
       lines: {
-        en: ["Daughter of Smt. Sangita Shah & Sh. Virendra Shah", "Granddaughter of Smt. Munni Devi & Sh. Satyanarayan Shah", "Mukundgarh Mandi, Jhunjhunu"],
+        en: ["Daughter of Mrs. Sangeeta Shah & Mr. Virendra Shah", "Granddaughter of Mrs. Munni Devi & Mr. Satyanarayan Shah", "Mukundgarh Mandi, Jhunjhunu"],
         hi: ["सुपुत्री : श्रीमती संगीता शाह एवं वीरेन्द्र शाह", "सुपौत्री : श्रीमती मुन्नी देवी एवं सत्यनारायण शाह", "निवासी : मुकुन्दगढ़ मण्डी (झुंझुनूं)"],
       },
       firm: { en: "Shah Trading Company, Mukundgarh Mandi", hi: "प्रतिष्ठान : शाह ट्रेडिंग कम्पनी, मुकुन्दगढ़ मण्डी" },
@@ -62,13 +62,13 @@ window.WEDDING = {
       side: { en: "The groom", hi: "वर पक्ष" },
       title: { en: "Smit", hi: "आयुष्मान् स्मित" },
       lines: {
-        en: ["Son of Smt. Meena Devi & Sh. Sunil Gupta", "Grandson of late Smt. Sita Devi & late Sh. Matadin Gupta"],
+        en: ["Son of Mrs. Meena Devi & Mr. Sunil Gupta", "Grandson of late Smt. Sita Devi & late Sh. Matadin Gupta"],
         hi: ["सुपुत्र : श्रीमती मीना देवी एवं श्री सुनील जी गुप्ता", "सुपौत्र : स्व. श्रीमती सीता देवी एवं स्व. श्री मातादीन जी गुप्ता"],
       },
       firm: { en: "Shri Shyam Textile, Ahmedabad, Gujarat", hi: "प्रतिष्ठान : श्री श्याम टेक्सटाईल, अहमदाबाद (गुजरात)" },
     },
     maternal: {
-      en: "Maternal family (Nanihal), Gadoda: Ramavatar ji, late Banwarilal ji, Jagdish ji",
+      en: "Maternal family (Nanihal), Garoda: Ramavatar ji, late Banwarilal ji, Jagdish ji",
       hi: "ननिहाल पक्ष : रामावतार जी, स्व. बनवारीलाल जी, जगदीश जी (निवासी : गाडोदा)",
     },
   },
@@ -106,7 +106,7 @@ window.WEDDING = {
     darshan: {
       title: { en: "Looking forward to seeing you", hi: "दर्शनाभिलाषी" },
       names: {
-        en: ["Sangita & Ramakant Shah", "Kiran & Devendra Shah", "Shweta & Dr. Narendra Shah", "Dr. Pragya & Dr. Ankit Shah"],
+        en: ["Sangeeta & Ramakant Shah", "Kiran & Devendra Shah", "Shweta & Dr. Narendra Shah", "Dr. Pragya & Dr. Ankit Shah"],
         hi: ["संगीता – रामाकान्त शाह", "किरण – देवेन्द्र शाह", "श्वेता – डॉ. नरेन्द्र शाह", "डॉ. प्रज्ञा – डॉ. अंकित शाह"],
       },
     },
@@ -120,7 +120,7 @@ window.WEDDING = {
     sweet: {
       title: { en: "With sweet insistence", hi: "मीठी मनुहार" },
       names: {
-        en: ["Tilak", "Mahak", "Harshit", "Mridul", "Priyanshi", "Divyam", "Chaitanya", "Nayesha"],
+        en: ["Tilak", "Mahak", "Harshit", "Mridul", "Priyanshi", "Divyam", "Chaitanya", "Naysha"],
         hi: ["तिलक", "महक", "हर्षित", "मृदुल", "प्रियांशी", "दिव्यम", "चैतन्य", "नायशा"],
       },
     },

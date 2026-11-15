@@ -121,8 +121,7 @@
     if (HI()) {
       s += line('hi-title', B.title.hi) + ORN + B.shloka.hi.map(function (l) { return line('hi-verse', l); }).join('') + ORN + line('hi-quote', B.quote.hi);
     } else {
-      s += line('title-en', B.title.en) + ORN + B.shloka.en.map(function (l) { return line('verse-en', l); }).join('') +
-        line('en-it gap-sm', B.meaning.en) + ORN + line('en-it', B.quote.en);
+      s += line('title-en', B.title.en) + ORN + B.shloka.en.map(function (l) { return line('verse-en', l); }).join('') + ORN + line('en-it', B.quote.en);
     }
     return s;
   }
