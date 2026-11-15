@@ -133,7 +133,6 @@ window.WEDDING = {
   // Phone numbers from the card. "tel" is for the call button, "wa" for WhatsApp (country code + number, no +).
   contacts: [
     { display: "94600 36251", tel: "+919460036251", wa: "919460036251" },
-    { display: "96103 72147", tel: "+919610372147", wa: "919610372147" },
   ],
 
   closing: {
