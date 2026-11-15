@@ -218,19 +218,19 @@
   var PR = Object.assign({}, ART.props, window.FIGURES ? { peacock: FIGURES.peacock, couple: FIGURES.couple } : {});
   var SLIDES = [
     { id: 'save-the-date', mood: 'day', box: [150, 270, 850, 905], html: sceneHero,
-      props: function () { return { arch: PR.peacock(245, 1566, 1, true) + PR.couple(585, 1554, 0.98) }; } },
+      props: function () { return { arch: PR.peacock(200, 1566, 1.05, true) + PR.couple(575, 1552, 0.98) }; } },
     { id: 'blessing', mood: 'dawn', box: [180, 290, 820, 1130], html: sceneBlessing,
       props: function () { return { arch: PR.bells() }; } },
     { id: 'invitation', mood: 'day', box: [120, 350, 880, 1520], top: true, html: sceneInvitation,
       props: function () { return { arch: '' }; } },
     { id: 'bride', mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.bride, nanihal()); },
-      props: function () { return { arch: PR.peacock(250, 1566, 1, true) }; } },
+      props: function () { return { arch: PR.peacock(205, 1566, 1, true) }; } },
     { id: 'groom', mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.groom); },
-      props: function () { return { arch: PR.peacock(750, 1566, 1, false) }; } },
+      props: function () { return { arch: PR.peacock(795, 1566, 1, false) }; } },
     { id: 'day-1', mood: 'morning', box: [175, 280, 825, 1070], html: function () { return sceneDay(W.days[0]); },
       props: function () { return { arch: PR.marigolds() }; } },
     { id: 'day-2', mood: 'golden', box: [175, 300, 825, 1130], html: function () { return sceneDay(W.days[1]); },
-      props: function () { return { arch: PR.marigolds() + PR.peacock(250, 1566, 1, true) }; } },
+      props: function () { return { arch: PR.marigolds() + PR.peacock(205, 1566, 1, true) }; } },
     { id: 'day-3', mood: 'dusk', box: [175, 300, 825, 1130], html: function () { return sceneDay(W.days[2]); },
       props: function () { return { glow: PR.lanterns() }; } },
     { id: 'venue', mood: 'night', box: [170, 300, 830, 1130], html: sceneVenue,
@@ -238,7 +238,7 @@
     { id: 'family', mood: 'night', box: [170, 290, 830, 1190], html: sceneGreetings,
       props: function () { return { glow: PR.lanterns() + PR.diyas() }; } },
     { id: 'rsvp', mood: 'moon', box: [150, 392, 850, 990], html: sceneClosing,
-      props: function () { return { arch: PR.couple(505, 1556, 0.82), glow: PR.diyas([150, 250, 760, 860]) }; } },
+      props: function () { return { arch: PR.couple(505, 1556, 0.8), glow: PR.diyas([150, 250, 760, 860]) }; } },
   ];
   var N = SLIDES.length;
 

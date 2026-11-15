@@ -1,8 +1,9 @@
 /*
   The couple, the peacock and the opening doors.
 
-  - The couple and the peacock are the illustrations in assets/figures (cut out of their
-    backgrounds), placed into the palace as SVG images.
+  - The couple walks in hand in hand, seen from the side: the groom in an ivory-champagne sherwani,
+    the bride in a blush-pink lehenga, both in the palace's own colours.
+  - The peacock perches on a ledge, its head dipping now and then.
   - The cover is a pair of carved sandstone doors under a marigold toran, with bougainvillea at
     the corners and a plaque of Ganesha and the couple's monogram between two peacocks.
 
@@ -62,28 +63,257 @@ window.FIGURES = (function () {
       '<pattern id="cd-jaali" patternUnits="userSpaceOnUse" width="60" height="60"><path d="M30 8 C34 18 42 26 52 30 C42 34 34 42 30 52 C26 42 18 34 8 30 C18 26 26 18 30 8Z" fill="none" stroke="#C98B68" stroke-width="1" opacity=".3"/><circle cx="30" cy="30" r="2.2" fill="#C98B68" opacity=".3"/><circle cx="0" cy="0" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="60" cy="0" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="0" cy="60" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="60" cy="60" r="1.8" fill="#C98B68" opacity=".25"/></pattern>' +
       lin('cd-leaf', [[0, '#5C8F3C'], [1, '#2E5A26']], { x2: 0, y2: 1 }) +
       lin('cd-ivory', [[0, '#FBF2E1'], [1, '#EFDDBE']], { x2: 0, y2: 1 }) +
+      // Peacock.
+      lin('p-pk-body', [[0, '#123C8F'], [0.45, '#2266CC'], [1, '#0E3378']], { x2: 0.6, y2: 1 }) +
+      lin('p-pk-neck', [[0, '#1D58C2'], [0.6, '#1E6FCB'], [1, '#178C9A']], { x2: 0, y2: 1 }) +
+      lin('p-pk-wing', [[0, '#DE9A5E'], [0.5, '#B86A34'], [1, '#8A4A22']], { x2: 0.4, y2: 1 }) +
+      lin('p-vane', [[0, '#2E6A3E', 0.92], [0.5, '#4A8C44', 0.9], [0.85, '#8FA83E', 0.9], [1, '#D6B84A', 0.88]], { x2: 0, y2: 1 }) +
+      '<pattern id="p-barbs" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(28)"><line x1="0" y1="0" x2="0" y2="4" stroke="#C3DA92" stroke-width=".5" opacity=".55"/></pattern>' +
+      '<pattern id="p-scales" patternUnits="userSpaceOnUse" width="6" height="5"><path d="M0 5 A3 3 0 0 1 6 5" fill="none" stroke="#7FC4F4" stroke-width=".6" opacity=".45"/></pattern>' +
+      '<pattern id="p-scales-g" patternUnits="userSpaceOnUse" width="7" height="6"><path d="M0 6 A3.5 3.5 0 0 1 7 6" fill="none" stroke="#F2D27A" stroke-width=".8" opacity=".7"/></pattern>' +
+      '<pattern id="p-wing-scale" patternUnits="userSpaceOnUse" width="8" height="7"><path d="M0 7 A4 4 0 0 1 8 7" fill="none" stroke="#6E3414" stroke-width=".9" opacity=".7"/><path d="M-4 3.5 A4 4 0 0 1 4 3.5 M4 3.5 A4 4 0 0 1 12 3.5" fill="none" stroke="#F6BE86" stroke-width=".5" opacity=".55"/></pattern>' +
+      '<symbol id="p-feather" overflow="visible">' +
+        '<path d="M0 0 C5 40 10 110 12 160 C13 184 8 198 0 202 C-8 198 -13 184 -12 160 C-10 110 -5 40 0 0Z" fill="url(#p-vane)"/>' +
+        '<path d="M0 0 C5 40 10 110 12 160 C13 184 8 198 0 202 C-8 198 -13 184 -12 160 C-10 110 -5 40 0 0Z" fill="url(#p-barbs)"/>' +
+        '<path d="M0 0 L0 196" stroke="#E2DCA8" stroke-width=".8" opacity=".55"/>' +
+      '</symbol>' +
+      '<symbol id="p-eye" overflow="visible">' +
+        '<path d="M0 -17 C10 -12 13 2 9 10 C6 16 -6 16 -9 10 C-13 2 -10 -12 0 -17Z" fill="#D4924E"/>' +
+        '<ellipse cy="2" rx="8.6" ry="10.6" fill="#2BA39A"/>' +
+        '<ellipse cy="2.5" rx="6.6" ry="8.2" fill="#2C6FD6"/>' +
+        '<path d="M0 -3 C4 -2 4.6 4 2.4 7.5 C1.2 9.4 -1.2 9.4 -2.4 7.5 C-4.6 4 -4 -2 0 -3Z" fill="#13246E"/>' +
+        '<ellipse cx="-1.4" cy="0.6" rx="1.2" ry="1.8" fill="#9BE0F0" opacity=".6"/>' +
+      '</symbol>' +
+      // The couple: faces, hair, and fabrics in the palace's colours.
+      rad('p-face', [[0, '#FBDCC4'], [0.6, '#F0C3A2'], [1, '#D69C78']], { cx: 0.42, cy: 0.4, r: 0.68 }) +
+      lin('p-skin2', [[0, '#E8B590'], [0.5, '#F4CEB0'], [1, '#D59D7A']]) +
+      lin('p-hair-b', [[0, '#6E482C'], [0.5, '#4C2F1C'], [1, '#2E1C10']], { x2: 0.3, y2: 1 }) +
+      lin('p-ivory2', [[0, '#D8C6A6'], [0.35, '#FBF4E6'], [0.7, '#F0E3CA'], [1, '#CDB892']]) +
+      lin('p-champ', [[0, '#CBB089'], [0.25, '#F2E3C7'], [0.55, '#FAF0DC'], [0.8, '#E6D2AE'], [1, '#C2A577']]) +
+      lin('p-blush', [[0, '#E9AFBC'], [0.5, '#F6D2D9'], [1, '#E3A2B1']]) +
+      lin('p-rose', [[0, '#B85A76'], [0.5, '#D9809A'], [1, '#B25470']]) +
+      lin('p-rosecholi', [[0, '#C4637F'], [0.5, '#E18AA2'], [1, '#BD5C79']]) +
+      lin('p-leh2', [[0, '#E58BA2'], [0.55, '#EFA3B6'], [0.72, '#F6D6D6'], [1, '#FBEDE2']], { x2: 0, y2: 1 }) +
+      lin('p-leh-shade', [[0, '#7A2440', 0.3], [0.22, '#7A2440', 0], [0.78, '#7A2440', 0], [1, '#7A2440', 0.3]]) +
+      lin('p-dup2', [[0, '#F4B6C6', 0.72], [1, '#E994AA', 0.55]], { x2: 0, y2: 1 }) +
+      lin('p-zari', [[0, '#A97F30'], [0.3, '#EED58E'], [0.55, '#C9A04B'], [0.8, '#F5E1A6'], [1, '#9B7429']], { x2: 0, y2: 1 }) +
+      rad('p-pearl', [[0, '#FFFFFF'], [0.6, '#F1ECE4'], [1, '#C9C0B4']], { cx: 0.35, cy: 0.35 }) +
+      '<pattern id="p-zari-pat" patternUnits="userSpaceOnUse" width="16" height="16"><path d="M0 8 Q4 2 8 8 T16 8" stroke="#8C6620" stroke-width="1.2" fill="none" opacity=".6"/><circle cx="8" cy="13" r="1.5" fill="#FFF4CC" opacity=".8"/><circle cx="0" cy="3" r="1" fill="#C9708A" opacity=".8"/></pattern>' +
+      '<pattern id="p-motif" patternUnits="userSpaceOnUse" width="30" height="34"><g fill="none" stroke="#C9A04B" stroke-width="1.1" opacity=".85"><path d="M15 5 C19.5 8.5 19.5 14 15 17.5 C10.5 14 10.5 8.5 15 5Z"/><path d="M15 17.5 C9 17.5 6.5 22 8 25.5 M15 17.5 C21 17.5 23.5 22 22 25.5"/></g><circle cx="15" cy="11.5" r="1.5" fill="#E2C27A"/><circle cx="0" cy="30" r="1.2" fill="#D4AE5E"/><circle cx="30" cy="30" r="1.2" fill="#D4AE5E"/></pattern>' +
       '</defs>';
   }
 
-  /* ---------- the peacock and the couple ---------- */
-  var PEACOCK = { src: 'assets/figures/peacock.webp', w: 495, h: 502, footX: 0.78 };
-  var COUPLE = { src: 'assets/figures/couple.webp', w: 389, h: 523 };
-
-  // A peacock standing with its feet at (x, y), about 330 units tall at sc = 1, its tail spread
-  // behind it. It faces right when flip is true and left otherwise.
+  /* ---------- the peacock ----------
+     Perched in profile on a ledge, facing left: a slim cobalt neck that turns teal at the base, white
+     face patches and a blue-tipped crest, copper wing coverts, and a long train of fine feathers
+     with ringed eyes draped down over the stone. Its head dips now and then (the .pk-head animation). */
   function peacock(x, y, sc, flip) {
-    var h = 330, w = h * PEACOCK.w / PEACOCK.h;
-    var shadow = el('ellipse', { cx: n(-w * 0.28), cy: 3, rx: n(w * 0.46), ry: 10, fill: '#3A1E10', opacity: 0.22, filter: 'url(#p-blur4)' });
-    var img = el('image', { href: PEACOCK.src, x: n(-w * PEACOCK.footX), y: -h, width: n(w), height: h });
-    return g({ class: 'peacock', transform: 'translate(' + x + ' ' + y + ') scale(' + (flip ? sc : -sc) + ' ' + sc + ')' }, shadow + img);
+    var s = '', r = rng(91);
+    var feathers = [];
+    for (var k = 0; k < 46; k++) feathers.push({ len: 0.45 + r() * 1.25, ox: 40 + r() * 20, oy: -96 + r() * 12, ang: -15 + r() * 17 });
+    feathers.sort(function (a, b) { return b.len - a.len; });
+    var train = '';
+    feathers.forEach(function (f) {
+      var L = 196 * f.len, th = f.ang * Math.PI / 180;
+      train += el('use', { href: '#p-feather', transform: 'translate(' + n(f.ox) + ' ' + n(f.oy) + ') rotate(' + n(f.ang) + ') scale(' + n(0.7 + f.len * 0.12) + ' ' + n(f.len) + ')' });
+      train += el('use', { href: '#p-eye', transform: 'translate(' + n(f.ox - L * Math.sin(th)) + ' ' + n(f.oy + L * Math.cos(th)) + ') rotate(' + n(f.ang) + ') scale(' + n(0.62 + f.len * 0.12) + ')' });
+    });
+    for (k = 0; k < 26; k++) {
+      var ox = 42 + r() * 18, len = 120 + r() * 220, ang = (-14 + r() * 16) * Math.PI / 180;
+      train += S('M' + n(ox) + ' -90 q' + n(-len * Math.sin(ang) * 0.5 + 4) + ' ' + n(len * 0.5) + ' ' + n(-len * Math.sin(ang)) + ' ' + n(len), r() > 0.5 ? '#A9C86E' : '#E0C060', 0.6, { opacity: 0.45 });
+    }
+    s += el('ellipse', { cx: 30, cy: 12, rx: 50, ry: 6, fill: '#3A1E10', opacity: 0.28, filter: 'url(#p-blur4)' });
+    s += train;
+    s += S('M-6 -76 L-9 -40 L-6 -2 M12 -78 L12 -40 L14 -2', '#C9A35A', 4.6);
+    s += S('M-6 -2 l-14 1 M-6 -2 l-4 3 M-6 -2 l6 2 M14 -2 l-14 1 M14 -2 l-4 3 M14 -2 l6 2', '#B89256', 3.2);
+    // Bronze-gold scaled feathers where the train begins.
+    s += P('M18 -134 C40 -134 58 -116 62 -94 L46 -84 C42 -100 32 -118 18 -134Z', '#B98A2E') + P('M18 -134 C40 -134 58 -116 62 -94 L46 -84 C42 -100 32 -118 18 -134Z', 'url(#p-scales-g)');
+    var body = 'M-34 -98 C-42 -122 -34 -148 -14 -158 C6 -166 30 -158 44 -140 C56 -124 58 -104 48 -90 C34 -76 8 -72 -10 -76 C-24 -80 -31 -88 -34 -98Z';
+    s += P(body, 'url(#p-pk-body)') + P(body, 'url(#p-scales)');
+    // Wing: copper coverts in rows of scallops, darker flight feathers.
+    var wing = 'M-16 -144 C6 -152 34 -146 50 -128 C60 -114 58 -98 50 -90 C34 -86 12 -88 -4 -98 C-16 -106 -22 -126 -16 -144Z';
+    s += P(wing, 'url(#p-pk-wing)') + P(wing, 'url(#p-wing-scale)');
+    s += P('M22 -98 C38 -104 54 -100 66 -88 C54 -82 38 -82 22 -88Z', '#8A4A22') + S('M28 -92 L60 -88 M30 -96 L58 -93', '#5A2E12', 0.8, { opacity: 0.7 });
+    var neck = 'M-34 -112 C-44 -140 -42 -176 -49 -206 C-53 -222 -59 -234 -57 -246 C-55 -257 -43 -259 -39 -249 C-35 -237 -37 -221 -33 -201 C-27 -173 -20 -150 -10 -132Z';
+    var head = P(neck, 'url(#p-pk-neck)') + P(neck, 'url(#p-scales)');
+    head += S('M-40 -140 C-46 -170 -44 -198 -50 -224', '#7FC2F4', 1.6, { opacity: 0.5 });
+    head += el('ellipse', { cx: -51, cy: -252, rx: 10, ry: 8.6, fill: '#1A55AE' });
+    head += P('M-60 -255.5 L-77 -251 L-60 -246.5Z', '#C9B48E') + P('M-60 -251 L-77 -251 L-62 -246.5Z', '#A8956F');
+    head += P('M-61 -258 C-58 -261 -51 -261 -47 -257 C-51 -254.5 -57 -254.5 -61 -258Z', '#FFFFFF');
+    head += S('M-59.5 -248.6 q5.2 3 11 0.4', '#FFFFFF', 2.3);
+    head += C(-55, -255.6, 1.9, '#0E0906') + C(-55.6, -256.2, 0.55, '#FFFFFF');
+    for (k = 0; k < 13; k++) {
+      var ca = (-122 + k * 6.2) * Math.PI / 180, cl = 26 + Math.sin(k / 12 * Math.PI) * 6;
+      var tx = -49 + Math.cos(ca) * cl, ty = -260 + Math.sin(ca) * cl;
+      head += S('M-49 -260 L' + n(tx) + ' ' + n(ty), '#DCE6F2', 0.8);
+      head += el('ellipse', { cx: n(tx), cy: n(ty), rx: 2.4, ry: 3.4, fill: '#2563C8', transform: 'rotate(' + n(ca * 180 / Math.PI + 90) + ' ' + n(tx) + ' ' + n(ty) + ')' });
+    }
+    s += g({ class: 'pk-head' }, head);
+    return g({ class: 'peacock', transform: 'translate(' + x + ' ' + y + ') scale(' + (flip ? -sc : sc) + ' ' + sc + ')' }, s);
   }
 
-  // The couple standing with their feet at (x, y), about 640 units tall at sc = 1, as one group
-  // (with its ground shadow) that the opening can bring in.
+  /* ---------- the couple ----------
+     Walking in from the right, hand in hand, seen from the side and turned a little towards us:
+     the groom ahead in an ivory-champagne sherwani with gold work, a blush inner panel and a
+     dusty-rose stole; the bride behind in a blush-pink lehenga that fades to ivory, with rose-gold
+     motifs, a gold border and a sheer pink dupatta over her head. Feet rest on y = 0. */
+  function limb(pts, ws) {
+    var left = [], right = [];
+    for (var i = 0; i < pts.length; i++) {
+      var a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      var dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      var nx = -dy / L, ny = dx / L;
+      left.push([pts[i][0] + nx * ws[i], pts[i][1] + ny * ws[i]]);
+      right.push([pts[i][0] - nx * ws[i], pts[i][1] - ny * ws[i]]);
+    }
+    var all = left.concat(right.reverse());
+    return 'M' + all.map(function (p) { return n(p[0]) + ' ' + n(p[1]); }).join(' L') + 'Z';
+  }
+
+  // A big, friendly eye: white, a brown iris with two catch-lights, and a dark upper lid.
+  function eyeBig(x, y, rx, ry, look, lashes, side) {
+    var s = el('ellipse', { cx: x, cy: y, rx: rx, ry: ry, fill: '#FFFFFF' });
+    s += el('ellipse', { cx: n(x + look), cy: n(y + 1), rx: n(rx * 0.78), ry: n(ry * 0.76), fill: '#7A4622' });
+    s += el('ellipse', { cx: n(x + look), cy: n(y + 1), rx: n(rx * 0.54), ry: n(ry * 0.52), fill: '#43230E' });
+    s += el('ellipse', { cx: n(x + look), cy: n(y + 1.5), rx: n(rx * 0.3), ry: n(ry * 0.3), fill: '#150804' });
+    s += C(x + look + rx * 0.3, y - ry * 0.28, n(rx * 0.27), '#FFFFFF');
+    s += C(x + look - rx * 0.3, y + ry * 0.34, n(rx * 0.12), '#FFFFFF', { opacity: 0.85 });
+    s += S('M' + n(x - rx - 1) + ' ' + n(y + 1.5) + ' C' + n(x - rx * 0.6) + ' ' + n(y - ry * 1.28) + ' ' + n(x + rx * 0.6) + ' ' + n(y - ry * 1.28) + ' ' + n(x + rx + 1) + ' ' + n(y - 0.5), '#2A140A', lashes ? 2.8 : 2.2);
+    if (lashes) {
+      var ox = x + side * (rx + 0.5);
+      s += S('M' + n(ox) + ' ' + n(y - 1) + ' l' + n(side * 4.2) + ' -3.2 M' + n(ox - side * 3) + ' ' + n(y - ry * 0.8) + ' l' + n(side * 3) + ' -3.6', '#2A140A', 1.6);
+    }
+    return s;
+  }
+
+  function groomFig() {
+    var s = '';
+    // Legs in ivory churidar with gathers at the ankle, and gold juttis with curled toes.
+    function leg(cls, c, base, far) {
+      var t = '';
+      t += P('M' + (c - 16) + ' -300 L' + (c + 16) + ' -300 C' + (c + 15) + ' -220 ' + (c + 12) + ' -110 ' + (c + 10) + ' -24 L' + (c - 10) + ' -24 C' + (c - 12) + ' -110 ' + (c - 15) + ' -220 ' + (c - 16) + ' -300Z', far ? '#DCCBAD' : 'url(#p-ivory2)');
+      for (var k = 0; k < 5; k++) t += S('M' + (c - 10) + ' ' + (-34 - k * 9) + ' q10 -4 20 0', '#C2AA82', 1.2, { opacity: 0.85 });
+      t += P('M' + (c - 11) + ' -26 L' + (c + 11) + ' -26 C' + (c + 14) + ' -14 ' + (c + 13) + ' -4 ' + (c + 9) + ' 2 L' + (c - 26) + ' 2 C' + (c - 36) + ' 2 ' + (c - 40) + ' -6 ' + (c - 34) + ' -10 C' + (c - 40) + ' -14 ' + (c - 38) + ' -18 ' + (c - 31) + ' -15 C' + (c - 24) + ' -12 ' + (c - 16) + ' -18 ' + (c - 11) + ' -26Z', far ? '#A8823E' : 'url(#p-goldmetal)');
+      t += S('M' + (c - 30) + ' -6 C' + (c - 18) + ' -10 ' + (c - 6) + ' -10 ' + (c + 6) + ' -7', '#7A5418', 1.3);
+      return g({ class: 'leg ' + cls, 'data-pivot': c + ' -300', 'data-base': base, transform: 'rotate(' + base + ' ' + c + ' -300)' }, t);
+    }
+    s += leg('leg--b', -50, -8, true);
+    s += leg('leg--f', -90, 7, false);
+    // The arm reaching back to hold her hand.
+    var back = limb([[-38, -466], [-16, -412], [4, -358]], [13, 11, 9]);
+    s += P(back, 'url(#p-ivory2)') + P(back, 'url(#p-motif)', { opacity: 0.5 });
+    s += P(limb([[0, -366], [4, -356]], [10, 10]), 'url(#p-zari)');
+    s += P('M-4 -356 C2 -360 12 -358 17 -352 C21 -346 19 -338 13 -336 C7 -335 2 -339 -2 -345Z', 'url(#p-skin2)');
+    // Sherwani: ivory-champagne with gold work, a blush inner panel and gold borders.
+    var coat = 'M-110 -482 C-124 -470 -130 -440 -128 -410 C-126 -380 -124 -350 -124 -330 C-126 -290 -132 -240 -140 -172 C-100 -164 -50 -164 -14 -172 C-18 -240 -22 -290 -24 -330 C-22 -360 -20 -400 -20 -430 C-20 -458 -26 -476 -40 -484 C-60 -492 -92 -490 -110 -482Z';
+    s += P(coat, 'url(#p-champ)') + P(coat, 'url(#p-motif)', { opacity: 0.75 });
+    s += S('M-60 -330 C-58 -280 -56 -220 -52 -172 M-36 -330 C-34 -280 -30 -220 -26 -174', '#B39466', 1.2, { opacity: 0.5 });
+    var panel = 'M-92 -484 L-80 -484 C-82 -420 -84 -320 -86 -170 L-128 -172 C-122 -260 -112 -360 -104 -420 C-100 -450 -96 -470 -92 -484Z';
+    s += P(panel, 'url(#p-blush)') + P(panel, 'url(#p-zari-pat)', { opacity: 0.55 });
+    s += S('M-80 -484 C-82 -420 -84 -320 -86 -170', 'url(#p-zari)', 8);
+    s += S('M-140 -172 C-100 -164 -50 -164 -14 -172', 'url(#p-zari)', 11);
+    s += S('M-138 -184 C-100 -176 -50 -176 -16 -184', '#C9A04B', 1.2, { 'stroke-dasharray': '2 4' });
+    [-468, -446, -424, -402, -380, -358].forEach(function (y, i) { s += C(-91 - i * 0.6, y, 2.6, 'url(#p-goldmetal)'); });
+    // Gold embroidery on the chest and at the hem.
+    s += S('M-50 -440 C-40 -452 -30 -446 -32 -436 C-34 -428 -44 -428 -46 -436 M-62 -230 C-50 -246 -36 -240 -38 -226 C-40 -216 -52 -216 -54 -226', '#B48A3C', 1.4);
+    // Stole: dusty rose with a gold border, hanging from the shoulder.
+    s += P('M-60 -492 C-46 -470 -42 -420 -44 -340 L-66 -336 C-64 -420 -66 -468 -76 -490Z', 'url(#p-rose)');
+    s += S('M-62 -490 C-48 -468 -44 -420 -46 -342 M-74 -490 C-64 -468 -62 -420 -64 -338', 'url(#p-zari)', 2.2);
+    for (var fr = 0; fr < 6; fr++) s += S('M' + n(-64 + fr * 3.6) + ' -337 l0 12', '#D9B460', 1.1);
+    s += P('M-94 -496 C-84 -490 -64 -490 -54 -496 L-54 -484 C-64 -478 -84 -478 -94 -484Z', 'url(#p-zari)');
+    // The arm swinging forward.
+    var front = limb([[-112, -470], [-128, -412], [-134, -358]], [14, 12, 10]);
+    s += P(front, 'url(#p-ivory2)') + P(front, 'url(#p-motif)', { opacity: 0.5 });
+    s += P(limb([[-133, -368], [-134, -356]], [11, 11]), 'url(#p-zari)');
+    s += P('M-144 -356 C-138 -360 -128 -360 -124 -354 C-120 -346 -124 -336 -132 -333 C-140 -332 -146 -340 -146 -348Z', 'url(#p-skin2)');
+    // Head.
+    s += P('M-84 -508 L-84 -480 L-58 -480 L-58 -508Z', 'url(#p-skin2)') + P('M-84 -508 L-58 -508 L-58 -494 C-66 -490 -76 -490 -84 -494Z', '#9A6044', { opacity: 0.3 });
+    s += el('ellipse', { cx: -22, cy: -560, rx: 8, ry: 14, fill: '#E3AE8A' }) + S('M-21 -568 C-17 -564 -17 -556 -21 -552', '#B97E5C', 1.4);
+    s += P('M-120 -590 C-122 -560 -116 -534 -102 -517 C-92 -506 -80 -501 -70 -501 C-58 -501 -45 -507 -36 -519 C-26 -534 -22 -560 -24 -590 C-26 -612 -44 -626 -72 -626 C-100 -626 -118 -612 -120 -590Z', 'url(#p-face)');
+    s += P('M-122 -580 C-128 -614 -108 -650 -74 -656 C-40 -660 -16 -640 -18 -604 C-18 -594 -20 -584 -24 -576 C-28 -594 -40 -606 -54 -610 C-66 -604 -88 -604 -100 -610 C-110 -604 -118 -594 -122 -580Z', 'url(#p-hair-b)');
+    s += P('M-112 -612 C-102 -644 -66 -652 -40 -638 C-62 -634 -84 -626 -98 -610Z', '#7A5234', { opacity: 0.85 });
+    s += S('M-100 -630 C-84 -642 -64 -644 -48 -636 M-92 -620 C-80 -630 -64 -632 -52 -626', '#9A6E48', 1.2, { opacity: 0.7 });
+    s += el('ellipse', { cx: -110, cy: -534, rx: 8, ry: 6, fill: '#E58A78', opacity: 0.2 }) + el('ellipse', { cx: -48, cy: -534, rx: 9, ry: 6, fill: '#E58A78', opacity: 0.2 });
+    s += eyeBig(-98, -560, 8, 10.2, -2, false) + eyeBig(-63, -560, 9, 10.5, -2, false);
+    s += S('M-108 -579 Q-99 -584 -89 -580', '#4A2E1B', 3) + S('M-73 -580 Q-62 -585 -52 -579', '#4A2E1B', 3);
+    s += S('M-83 -547 C-87 -540 -90 -535 -85 -532 C-82 -531 -79 -532 -78 -534', '#C08262', 1.6);
+    s += P('M-95 -521 Q-81 -508 -67 -521 Q-81 -514 -95 -521Z', '#FFFFFF') + S('M-96 -521.5 Q-81 -507 -66 -521.5', '#8A4434', 2) + S('M-98 -523 l-2 -2 M-64 -523 l2 -2', '#B97E5C', 1.2);
+    return s;
+  }
+
+  function brideFig() {
+    var s = '';
+    // The far arm, at her side behind the lehenga.
+    s += P(limb([[130, -454], [146, -404], [152, -356]], [10, 8.5, 7.5]), 'url(#p-skin2)');
+    s += P('M144 -356 C150 -360 158 -358 161 -352 C163 -346 160 -338 154 -337 C148 -337 144 -342 143 -348Z', 'url(#p-skin2)');
+    // The dupatta falling behind her.
+    s += P('M138 -598 C162 -580 170 -520 176 -440 C186 -320 198 -200 206 -64 L172 -60 C166 -200 156 -320 150 -430 C146 -490 146 -550 132 -590Z', 'url(#p-dup2)');
+    s += S('M138 -598 C162 -580 170 -520 176 -440 C186 -320 198 -200 206 -64', 'url(#p-zari)', 4);
+    // Lehenga: blush pink fading to ivory, rose-gold motifs, an embroidered ivory band and a gold border.
+    var SK = 'M62 -388 C44 -320 22 -200 6 -20 C6 -8 12 0 24 2 C80 10 160 10 200 -2 C212 -6 216 -14 214 -24 C196 -180 160 -320 130 -388Z';
+    var det = '';
+    for (var i = 0; i < 10; i++) {
+      var w0 = 62 + 68 * i / 10, w1 = 62 + 68 * (i + 1) / 10, h0 = 4 + 214 * i / 10, h1 = 4 + 214 * (i + 1) / 10;
+      det += P('M' + n(w0) + ' -388 Q' + n(w0 + (h0 - w0) * 0.4) + ' -200 ' + n(h0) + ' 20 L' + n(h1) + ' 20 Q' + n(w1 + (h1 - w1) * 0.4) + ' -200 ' + n(w1) + ' -388Z', i % 2 ? '#FFFFFF' : '#8E3A55', { opacity: i % 2 ? 0.14 : 0.08 });
+    }
+    det += el('rect', { x: 0, y: -392, width: 230, height: 270, fill: 'url(#p-motif)' });
+    det += P('M-10 -126 C80 -116 160 -116 230 -128 L230 -120 C160 -108 80 -108 -10 -118Z', 'url(#p-zari)');
+    for (var ax = -4; ax < 230; ax += 34) {
+      det += P('M' + ax + ' -36 L' + ax + ' -84 Q' + (ax + 15) + ' -110 ' + (ax + 30) + ' -84 L' + (ax + 30) + ' -36Z', '#E792A8', { stroke: '#C9A04B', 'stroke-width': 1.4, opacity: 0.9 });
+      det += P('M' + (ax + 15) + ' -80 C' + (ax + 20) + ' -72 ' + (ax + 20) + ' -62 ' + (ax + 15) + ' -54 C' + (ax + 10) + ' -62 ' + (ax + 10) + ' -72 ' + (ax + 15) + ' -80Z', '#E2BE6A');
+    }
+    det += P('M-10 -26 C80 -14 160 -14 230 -30 L230 30 L-10 30Z', 'url(#p-zari)') + P('M-10 -20 C80 -8 160 -8 230 -24 L230 30 L-10 30Z', 'url(#p-zari-pat)', { opacity: 0.8 });
+    det += el('rect', { x: 0, y: -392, width: 230, height: 420, fill: 'url(#p-leh-shade)' });
+    s += '<g class="skirt" data-waist="-388">' + P(SK, 'url(#p-leh2)') + '<clipPath id="pc-sk3"><path d="' + SK + '"/></clipPath>' + g({ 'clip-path': 'url(#pc-sk3)' }, det) +
+      S('M6 -20 C6 -8 12 0 24 2 C80 10 160 10 200 -2', '#8C6620', 2, { opacity: 0.45 }) + '</g>';
+    s += P('M62 -394 L130 -394 L130 -384 L62 -384Z', 'url(#p-zari)');
+    // Midriff and choli.
+    s += P('M63 -404 L129 -404 L129 -392 L63 -392Z', 'url(#p-skin2)');
+    var choli = 'M66 -466 C56 -458 52 -440 56 -420 C58 -412 60 -406 62 -402 L130 -402 C134 -418 136 -440 132 -458 C126 -468 110 -472 96 -472 C84 -472 74 -470 66 -466Z';
+    s += P(choli, 'url(#p-rosecholi)') + P(choli, 'url(#p-motif)', { opacity: 0.7 });
+    s += P('M60 -410 L132 -410 L131 -402 L61 -402Z', 'url(#p-zari)');
+    // The arm reaching forward to hold his hand: a short sleeve, bangles, henna.
+    s += P(limb([[68, -458], [56, -430]], [12, 11]), 'url(#p-rosecholi)') + P(limb([[57, -434], [55, -428]], [11, 11]), 'url(#p-zari)');
+    s += P(limb([[56, -432], [42, -398], [16, -356]], [10, 9, 7.5]), 'url(#p-skin2)');
+    for (var b = 0; b < 6; b++) {
+      var t = 0.55 + b * 0.07, bx = 42 + (16 - 42) * t, by = -398 + (-356 + 398) * t;
+      s += S('M' + n(bx - 7) + ' ' + n(by - 5) + ' L' + n(bx + 7) + ' ' + n(by + 5), b % 3 === 1 ? '#F3E1C4' : (b % 3 === 0 ? '#D9B460' : '#D9708C'), 3.2);
+    }
+    s += P('M18 -362 C12 -362 4 -358 2 -352 C0 -346 4 -340 10 -340 C16 -340 20 -346 22 -352Z', 'url(#p-skin2)') + S('M6 -350 c3 -2 7 -2 9 1', '#A85A35', 0.9);
+    // Neck and jewellery.
+    s += P('M86 -492 L86 -468 L108 -468 L108 -492Z', 'url(#p-skin2)') + P('M86 -492 L108 -492 L108 -482 C100 -479 92 -479 86 -482Z', '#9A6044', { opacity: 0.28 });
+    s += P('M84 -474 C92 -466 102 -466 110 -474 L110 -466 C102 -458 92 -458 84 -466Z', 'url(#p-goldmetal)');
+    s += S('M82 -466 C84 -446 94 -436 97 -436 C100 -436 110 -446 112 -466', 'url(#p-goldmetal)', 2.4);
+    s += C(97, -434, 3.4, '#2E8C6A') + C(90, -462, 1.6, '#D9708C') + C(97, -460, 1.6, '#2E8C6A') + C(104, -462, 1.6, '#D9708C');
+    // Head: hair, face, a maang tikka and jhumkas.
+    s += P('M100 -600 C130 -604 156 -584 158 -548 C160 -520 156 -496 150 -480 L124 -500 C130 -530 128 -560 118 -578Z', '#3E2616');
+    s += P('M136 -566 C147 -548 153 -514 149 -478 C147 -469 140 -467 138 -473 C142 -500 140 -530 133 -556Z M58 -566 C47 -548 41 -514 45 -478 C47 -469 54 -467 56 -473 C52 -500 54 -530 61 -556Z', 'url(#p-hair-b)');
+    s += P('M46 -560 C42 -598 64 -626 98 -626 C132 -626 152 -598 148 -560 C142 -584 126 -596 98 -596 C70 -596 54 -584 46 -560Z', 'url(#p-hair-b)');
+    s += P('M52 -568 C50 -540 56 -516 70 -500 C79 -490 89 -486 98 -486 C109 -486 120 -492 128 -503 C138 -518 142 -542 140 -568 C138 -592 122 -606 96 -606 C70 -606 54 -592 52 -568Z', 'url(#p-face)');
+    s += P('M58 -566 C62 -590 80 -600 98 -598 C116 -600 132 -590 136 -566 C130 -584 116 -592 98 -590 C80 -592 64 -584 58 -566Z', 'url(#p-hair-b)');
+    s += S('M98 -624 L98 -598', '#2E1C10', 1.2);
+    s += el('ellipse', { cx: 61, cy: -520, rx: 8, ry: 6, fill: '#E8808E', opacity: 0.24 }) + el('ellipse', { cx: 121, cy: -520, rx: 9, ry: 6, fill: '#E8808E', opacity: 0.24 });
+    s += eyeBig(73, -546, 8.6, 11.2, -2, true, -1) + eyeBig(108, -546, 9.5, 11.5, -2, true, 1);
+    s += S('M63 -564 Q73 -569 82 -565', '#3A2416', 2) + S('M98 -565 Q108 -569 118 -564', '#3A2416', 2);
+    s += S('M89 -530 C87 -524 85 -520 88 -518 C90 -517 93 -518 94 -519', '#C08262', 1.4);
+    s += C(85.5, -519.5, 2.2, 'none', { stroke: 'url(#p-goldmetal)', 'stroke-width': 1.1 });
+    s += P('M79 -505 Q90 -494 101 -505 Q90 -500 79 -505Z', '#D65A72') + S('M79 -505.5 Q90 -500 101 -505.5', '#A83A52', 1.2);
+    s += S('M98 -598 L97 -590', 'url(#p-goldmetal)', 1.4) + P('M97 -592 C101 -588 101 -582 97 -578 C93 -582 93 -588 97 -592Z', 'url(#p-goldmetal)') + C(97, -585, 1.8, '#2E8C6A');
+    [[49, -528], [145, -528]].forEach(function (j) {
+      var x = j[0], y = j[1];
+      s += C(x, y, 3, 'url(#p-goldmetal)') + P('M' + (x - 8) + ' ' + (y + 18) + ' C' + (x - 8) + ' ' + (y + 5) + ' ' + (x + 8) + ' ' + (y + 5) + ' ' + (x + 8) + ' ' + (y + 18) + 'Z', 'url(#p-goldmetal)');
+      for (var jp = 0; jp < 5; jp++) s += C(x - 7 + jp * 3.5, y + 20, 1.3, jp % 2 ? '#D9708C' : 'url(#p-pearl)');
+    });
+    // The dupatta over her head, with a gold border at its edge.
+    s += P('M56 -586 C66 -630 130 -642 152 -602 C160 -586 162 -566 160 -546 L148 -550 C148 -570 144 -588 134 -600 C114 -620 76 -616 66 -588Z', 'url(#p-dup2)');
+    s += S('M66 -588 C76 -616 114 -620 134 -600 C144 -588 148 -570 148 -550', 'url(#p-zari)', 4);
+    return s;
+  }
+
+  // The couple as one group, with its ground shadow, that the opening walk can move.
   function coupleGroup(x, y, sc) {
-    var h = 640, w = h * COUPLE.w / COUPLE.h;
-    var body = el('ellipse', { cx: 0, cy: 4, rx: n(w * 0.46), ry: 14, fill: '#3A1E10', opacity: 0.28, filter: 'url(#p-blur10)' }) +
-      el('image', { href: COUPLE.src, x: n(-w / 2), y: -h, width: n(w), height: h });
+    var body = el('ellipse', { cx: 10, cy: 6, rx: 200, ry: 14, fill: '#3A1E10', opacity: 0.26, filter: 'url(#p-blur10)' }) +
+      g({ class: 'groom' }, groomFig()) + g({ class: 'bride' }, brideFig());
     return g({ class: 'couple', transform: 'translate(' + x + ' ' + y + ') scale(' + sc + ')' }, g({ class: 'couple-body' }, body));
   }
 
@@ -250,8 +480,8 @@ window.FIGURES = (function () {
   // The plaque: Ganesha above the couple's monogram, between two peacocks perched on a ledge.
   function crest(ganeshaSvg, initials) {
     var s = '<svg viewBox="0 0 1000 700" aria-hidden="true" focusable="false" overflow="visible">';
-    s += P('M40 430 L960 430 L946 446 L54 446Z', 'url(#cd-gold)');
-    s += peacock(282, 431, 0.86, true) + peacock(718, 431, 0.86, false);
+    s += peacock(250, 432, 0.78, true) + peacock(750, 432, 0.78, false);
+    s += P('M150 430 L850 430 L838 446 L162 446Z', 'url(#cd-gold)');
     [320, 500, 680].forEach(function (x) { s += P('M' + (x - 14) + ' 446 L' + (x + 14) + ' 446 C' + (x + 10) + ' 462 ' + (x + 2) + ' 470 ' + x + ' 474 C' + (x - 2) + ' 470 ' + (x - 10) + ' 462 ' + (x - 14) + ' 446Z', 'url(#cd-gold)'); });
     var body = 'M390 430 L390 250 C390 232 400 222 414 220 L586 220 C600 222 610 232 610 250 L610 430Z';
     var dome = 'M400 224 C400 170 450 140 480 120 C492 112 498 100 500 86 C502 100 508 112 520 120 C550 140 600 170 600 224Z';
