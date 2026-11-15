@@ -150,7 +150,10 @@ button { font: inherit; color: inherit; }
 .cover-face > * { position: absolute; left: 0; right: 0; margin: 0 auto; }
 
 .toran { top: var(--oy); left: var(--ox); right: auto; width: calc(1000 * var(--u)); height: calc(190 * var(--u)); animation: drop-in 1.4s cubic-bezier(.2, .7, .2, 1) 0.15s both; }
-.toran svg, .cover-crest svg, .cover-flora svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.toran svg, .cover-crest svg, .cover-flora svg, .cover-base svg { width: 100%; height: 100%; display: block; overflow: visible; }
+/* The outer petals of the mandala on the doors turn very slowly. */
+.md-turn { transform-origin: 500px 790px; animation: md-turn 240s linear infinite; }
+@keyframes md-turn { to { transform: rotate(360deg); } }
 .cover-flora { top: var(--oy); left: var(--ox); right: auto; width: calc(1000 * var(--u)); height: calc(520 * var(--u)); opacity: 0; animation: fade-in 1.6s ease 0.35s forwards; }
 
 /* Petals drifting down over the doors. */
@@ -175,7 +178,7 @@ button { font: inherit; color: inherit; }
 }
 
 .cover-bless {
-  top: calc(var(--oy) + 266 * var(--u));
+  top: calc(var(--oy) + 354 * var(--u));
   margin: 0 auto;
   font-family: var(--deva-display);
   font-weight: 700;
@@ -185,10 +188,11 @@ button { font: inherit; color: inherit; }
   opacity: 0;
   animation: fade-in 1.2s ease 0.5s forwards;
 }
-.cover-crest { top: calc(var(--oy) + 330 * var(--u)); left: var(--ox); right: auto; width: calc(1000 * var(--u)); height: calc(700 * var(--u)); opacity: 0; animation: rise-in 1.6s cubic-bezier(.2, .7, .2, 1) 0.7s forwards; }
+.cover-crest { top: calc(var(--oy) + 188 * var(--u)); left: var(--ox); right: auto; width: calc(1000 * var(--u)); height: calc(170 * var(--u)); opacity: 0; animation: rise-in 1.6s cubic-bezier(.2, .7, .2, 1) 0.4s forwards; }
+.cover-base { top: calc(var(--oy) + 1300 * var(--u)); left: var(--ox); right: auto; width: calc(1000 * var(--u)); height: calc(600 * var(--u)); pointer-events: none; opacity: 0; animation: rise-in 1.6s cubic-bezier(.2, .7, .2, 1) 0.9s forwards; }
 
 .cover-names {
-  top: calc(var(--oy) + 788 * var(--u));
+  top: calc(var(--oy) + 636 * var(--u));
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -201,7 +205,7 @@ button { font: inherit; color: inherit; }
 .cover-names .cn {
   font-family: var(--caps);
   font-weight: 500;
-  font-size: max(44px, calc(118 * var(--u)));
+  font-size: max(40px, calc(104 * var(--u)));
   letter-spacing: 0.12em;
   padding: 0.04em 0 0.04em 0.12em;
   background-image: linear-gradient(100deg, #7A5518 0%, #B8892E 18%, #E6C67E 34%, #A77A27 50%, #D4AE5E 68%, #8C6420 100%);
@@ -211,9 +215,9 @@ button { font: inherit; color: inherit; }
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 calc(2 * var(--u)) calc(6 * var(--u)) rgba(255, 248, 236, 0.9));
 }
-.cover-names .amp { font-family: var(--script); font-size: max(38px, calc(100 * var(--u))); line-height: 0.9; color: #A0782C; margin: calc(2 * var(--u)) 0 calc(-4 * var(--u)); }
+.cover-names .amp { font-family: var(--script); font-size: max(34px, calc(88 * var(--u))); line-height: 0.9; color: #A0782C; margin: calc(2 * var(--u)) 0 calc(-4 * var(--u)); }
 .cover-date {
-  top: calc(var(--oy) + 1160 * var(--u));
+  top: calc(var(--oy) + 1168 * var(--u));
   margin: 0 auto;
   font-family: var(--serif);
   font-weight: 500;
@@ -223,7 +227,7 @@ button { font: inherit; color: inherit; }
   animation: fade-in 1.2s ease 1.5s forwards;
 }
 .cover-place {
-  top: calc(var(--oy) + 1216 * var(--u));
+  top: calc(var(--oy) + 1222 * var(--u));
   margin: 0 auto;
   font-family: var(--serif);
   font-style: italic;
@@ -234,7 +238,7 @@ button { font: inherit; color: inherit; }
   animation: fade-in 1.2s ease 1.6s forwards;
 }
 .cover-open {
-  top: calc(var(--oy) + 1300 * var(--u));
+  top: calc(var(--oy) + 1292 * var(--u));
   width: max-content;
   min-height: 48px;
   padding: 0 max(24px, calc(60 * var(--u)));
@@ -256,7 +260,7 @@ button { font: inherit; color: inherit; }
 .cover-open:active { transform: scale(0.97); }
 .cover-open:focus-visible { outline: 2px solid #A0782C; outline-offset: 5px; }
 .cover-note {
-  top: calc(var(--oy) + 1418 * var(--u));
+  top: calc(var(--oy) + 1412 * var(--u));
   margin: 0 auto;
   font-family: var(--serif);
   font-style: italic;
@@ -622,7 +626,7 @@ button { font: inherit; color: inherit; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sway, .flame, .flicker, .ripples, .pk-head, .twinkle, .hint.is-on { animation: none !important; }
+  .sway, .flame, .flicker, .ripples, .pk-head, .twinkle, .hint.is-on, .md-turn { animation: none !important; }
   .rv { transition-duration: 0.3s; transition-delay: 0s; transform: none; filter: none; }
   .crest .draw { animation-duration: 0.01s; animation-delay: 0s; }
 }
@@ -710,6 +714,6 @@ button { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .petal { display: none; }
-  .toran, .cover-flora, .cover-bless, .cover-crest, .cover-names, .cover-date, .cover-place, .cover-open, .cover-note { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+  .toran, .cover-flora, .cover-bless, .cover-crest, .cover-base, .cover-names, .cover-date, .cover-place, .cover-open, .cover-note { animation-duration: 0.01s !important; animation-delay: 0s !important; }
   .door, .door::after { transition: none; }
   }

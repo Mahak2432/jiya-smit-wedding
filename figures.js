@@ -5,7 +5,8 @@
     the bride in a blush-pink lehenga, both in the palace's own colours.
   - The peacock perches on a ledge, its head dipping now and then.
   - The cover is a pair of carved sandstone doors under a marigold toran, with bougainvillea at
-    the corners and a plaque of Ganesha and the couple's monogram between two peacocks.
+    the corners, Ganesha in a lotus medallion at the top, a lotus mandala across the middle that
+    holds the couple's names, and a carved ledge at the foot where two peacocks face a brass kalash.
 
   Drawn in the same "bay units" as art.js (an arch bay is 1000 x 1900).
 */
@@ -63,6 +64,13 @@ window.FIGURES = (function () {
       '<pattern id="cd-jaali" patternUnits="userSpaceOnUse" width="60" height="60"><path d="M30 8 C34 18 42 26 52 30 C42 34 34 42 30 52 C26 42 18 34 8 30 C18 26 26 18 30 8Z" fill="none" stroke="#C98B68" stroke-width="1" opacity=".3"/><circle cx="30" cy="30" r="2.2" fill="#C98B68" opacity=".3"/><circle cx="0" cy="0" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="60" cy="0" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="0" cy="60" r="1.8" fill="#C98B68" opacity=".25"/><circle cx="60" cy="60" r="1.8" fill="#C98B68" opacity=".25"/></pattern>' +
       lin('cd-leaf', [[0, '#5C8F3C'], [1, '#2E5A26']], { x2: 0, y2: 1 }) +
       lin('cd-ivory', [[0, '#FBF2E1'], [1, '#EFDDBE']], { x2: 0, y2: 1 }) +
+      rad('cd-disc', [[0, '#FFFAF3', 0.96], [0.88, '#FFF6EA', 0.9], [1, '#FFF6EA', 0]]) +
+      lin('cd-brass', [[0, '#7C5518'], [0.22, '#C3933F'], [0.42, '#F6DE98'], [0.6, '#D2A24C'], [1, '#76501A']]) +
+      rad('cd-coconut', [[0, '#A87244'], [0.65, '#704527'], [1, '#4A2C17']], { cx: 0.4, cy: 0.35 }) +
+      rad('cd-flame', [[0, '#FFF8D6'], [0.5, '#FFD25A'], [1, '#F08A1E']], { cx: 0.5, cy: 0.75, r: 0.7 }) +
+      rad('cd-halo', [[0, '#FFD27A', 0.55], [1, '#FFD27A', 0]]) +
+      rad('cd-stud', [[0, '#FFF3C4'], [0.45, '#D8B25F'], [1, '#86601C']], { cx: 0.35, cy: 0.35 }) +
+      lin('cd-shade', [[0, '#6E4630', 0.3], [1, '#6E4630', 0]], { x2: 0, y2: 1 }) +
       // Peacock.
       lin('p-pk-body', [[0, '#123C8F'], [0.45, '#2266CC'], [1, '#0E3378']], { x2: 0.6, y2: 1 }) +
       lin('p-pk-neck', [[0, '#1D58C2'], [0.6, '#1E6FCB'], [1, '#178C9A']], { x2: 0, y2: 1 }) +
@@ -365,47 +373,72 @@ window.FIGURES = (function () {
     return g({ transform: 'translate(' + x + ' ' + y + ') scale(' + (flip ? -sc : sc) + ' ' + sc + ')' }, s);
   }
 
-  // A Rajasthani palace in fine gold line, standing along the foot of the doors.
-  function palaceLine() {
-    var s = '', ln = { fill: 'rgba(255, 247, 238, 0.45)', stroke: '#B48A3C', 'stroke-width': 1.5, 'stroke-linejoin': 'round' };
-    function dome(cx, base, w, h) {
-      return P('M' + (cx - w / 2) + ' ' + base + ' C' + (cx - w / 2) + ' ' + (base - h * 0.55) + ' ' + (cx - w * 0.12) + ' ' + (base - h * 0.7) + ' ' + cx + ' ' + (base - h) +
-        ' C' + (cx + w * 0.12) + ' ' + (base - h * 0.7) + ' ' + (cx + w / 2) + ' ' + (base - h * 0.55) + ' ' + (cx + w / 2) + ' ' + base + 'Z', ln.fill, ln) +
-        S('M' + cx + ' ' + (base - h) + ' l0 ' + (-h * 0.28), '#B48A3C', 1.5) + C(cx, base - h * 1.3, 2.2, '#B48A3C');
+  // A small eight-petalled rosette in gold.
+  function rosette(cx, cy, r) {
+    var s = '';
+    for (var p = 0; p < 8; p++) {
+      var an = p * Math.PI / 4, px = cx + Math.cos(an) * r, py = cy + Math.sin(an) * r;
+      s += el('ellipse', { cx: n(px), cy: n(py), rx: n(r * 0.66), ry: n(r * 0.33), fill: '#B48A3C', opacity: 0.8, transform: 'rotate(' + n(an * 180 / Math.PI) + ' ' + n(px) + ' ' + n(py) + ')' });
     }
-    function arches(x0, x1, base, h, count) {
-      var w = (x1 - x0) / count, t = '';
-      for (var k = 0; k < count; k++) {
-        var a = x0 + k * w + w * 0.18, b = x0 + (k + 1) * w - w * 0.18, m = (a + b) / 2;
-        t += P('M' + n(a) + ' ' + base + ' L' + n(a) + ' ' + n(base - h * 0.6) + ' Q' + n(a) + ' ' + n(base - h) + ' ' + n(m) + ' ' + n(base - h) + ' Q' + n(b) + ' ' + n(base - h) + ' ' + n(b) + ' ' + n(base - h * 0.6) + ' L' + n(b) + ' ' + base + 'Z', 'rgba(201, 139, 104, 0.18)', { stroke: '#B48A3C', 'stroke-width': 1.1 });
-      }
-      return t;
+    return s + C(cx, cy, n(r * 0.45), '#CFA453');
+  }
+
+  // A lotus mandala painted across both doors, centred on MC. The couple's names sit in its plain
+  // middle; when the doors open it parts down the middle. The outer ring of petals turns very slowly.
+  var MC = [500, 790];
+  function mandala() {
+    var cx = MC[0], cy = MC[1], s = '', k;
+    function around(count, step, fn) { var t = ''; for (var i = 0; i < count; i++) t += g({ transform: 'rotate(' + n(i * step) + ' ' + cx + ' ' + cy + ')' }, fn()); return t; }
+    function at(dx, dy) { return n(cx + dx) + ' ' + n(cy + dy); }
+    s += C(cx, cy, 256, 'url(#cd-disc)');
+    // The broad inner lotus.
+    s += around(16, 22.5, function () {
+      return P('M' + at(-44, -236) + ' C' + at(-44, -266) + ' ' + at(-16, -284) + ' ' + at(0, -298) + ' C' + at(16, -284) + ' ' + at(44, -266) + ' ' + at(44, -236) + 'Z', 'rgba(255, 246, 232, 0.6)', { stroke: '#B48A3C', 'stroke-width': 1.6 }) +
+        S('M' + at(-26, -238) + ' C' + at(-24, -258) + ' ' + at(-10, -272) + ' ' + at(0, -282) + ' C' + at(10, -272) + ' ' + at(24, -258) + ' ' + at(26, -238), '#C9A04B', 1, { opacity: 0.75 }) +
+        C(cx, cy - 254, 3.2, '#C9A04B');
+    });
+    s += around(16, 22.5, function () { return C(cx, cy - 292, 2.6, '#B48A3C', { transform: 'rotate(11.25 ' + cx + ' ' + cy + ')' }); });
+    s += C(cx, cy, 236, 'none', { stroke: 'url(#cd-gold)', 'stroke-width': 2.4 }) + C(cx, cy, 227, 'none', { stroke: '#C9A04B', 'stroke-width': 0.8, opacity: 0.8 });
+    s += C(cx, cy, 304, 'none', { stroke: '#B48A3C', 'stroke-width': 1.1, opacity: 0.85 });
+    var dots = '';
+    for (k = 0; k < 64; k++) { var an = k * Math.PI / 32; dots += C(cx + Math.cos(an) * 311, cy + Math.sin(an) * 311, 2.4, '#B48A3C', { opacity: 0.85 }); }
+    // The slim outer petals, turning.
+    var outer = around(32, 11.25, function () {
+      return P('M' + at(-27, -318) + ' C' + at(-27, -336) + ' ' + at(-9, -344) + ' ' + at(0, -358) + ' C' + at(9, -344) + ' ' + at(27, -336) + ' ' + at(27, -318) + 'Z', 'rgba(255, 246, 232, 0.35)', { stroke: '#B48A3C', 'stroke-width': 1.3 }) +
+        S('M' + at(0, -322) + ' L' + at(0, -346), '#C9A04B', 0.9, { opacity: 0.7 }) +
+        C(cx, cy - 346, 2, '#B48A3C', { transform: 'rotate(5.625 ' + cx + ' ' + cy + ')' });
+    });
+    return s + g({ class: 'md-turn' }, dots + C(cx, cy, 317, 'none', { stroke: '#B48A3C', 'stroke-width': 0.8, opacity: 0.7 }) + outer);
+  }
+
+  // A carved stone ledge across the doors, which the peacocks and the kalash stand on, and the
+  // door panels below it with brass studs.
+  var LEDGE = 1640;
+  function ledge() {
+    var y = LEDGE, s = '', x;
+    s += el('rect', { x: 86, y: y + 52, width: 828, height: 46, fill: 'url(#cd-shade)' });
+    s += P('M78 ' + y + ' L922 ' + y + ' L910 ' + (y + 12) + ' L90 ' + (y + 12) + 'Z', '#FCF0E0', { stroke: '#B48A3C', 'stroke-width': 1.4 });
+    s += el('rect', { x: 90, y: y + 12, width: 820, height: 40, fill: '#EDC3A2', stroke: '#B48A3C', 'stroke-width': 1.4 });
+    for (x = 104; x + 24 <= 898; x += 31) {
+      s += P('M' + x + ' ' + (y + 46) + ' L' + x + ' ' + (y + 28) + ' Q' + x + ' ' + (y + 18) + ' ' + (x + 12) + ' ' + (y + 17) + ' Q' + (x + 24) + ' ' + (y + 18) + ' ' + (x + 24) + ' ' + (y + 28) + ' L' + (x + 24) + ' ' + (y + 46) + 'Z',
+        'rgba(170, 110, 72, 0.2)', { stroke: '#B48A3C', 'stroke-width': 0.9 });
     }
-    function chhatri(cx, base, w) {
-      return el('rect', Object.assign({ x: cx - w / 2, y: base - 4, width: w, height: 4 }, ln)) +
-        S('M' + (cx - w * 0.38) + ' ' + (base - 4) + ' l0 -' + (w * 0.7) + ' M' + (cx + w * 0.38) + ' ' + (base - 4) + ' l0 -' + (w * 0.7), '#B48A3C', 1.3) +
-        el('rect', Object.assign({ x: cx - w * 0.55, y: base - 4 - w * 0.7 - 5, width: w * 1.1, height: 5 }, ln)) +
-        dome(cx, base - 9 - w * 0.7, w * 0.95, w * 0.75);
-    }
-    // Wings, towers and the central block.
-    s += el('rect', Object.assign({ x: 176, y: 1690, width: 210, height: 140 }, ln)) + el('rect', Object.assign({ x: 614, y: 1690, width: 210, height: 140 }, ln));
-    s += arches(176, 386, 1830, 64, 5) + arches(614, 824, 1830, 64, 5);
-    s += arches(176, 386, 1752, 40, 7) + arches(614, 824, 1752, 40, 7);
-    s += S('M170 1690 L392 1690 M608 1690 L830 1690 M170 1760 L392 1760 M608 1760 L830 1760', '#B48A3C', 1.4);
-    [214, 290, 350, 650, 710, 786].forEach(function (x, i) { s += i % 3 === 1 ? chhatri(x, 1690, 30) : dome(x, 1690, 22, 20); });
-    s += el('rect', Object.assign({ x: 134, y: 1640, width: 42, height: 190 }, ln)) + el('rect', Object.assign({ x: 824, y: 1640, width: 42, height: 190 }, ln));
-    s += dome(155, 1640, 40, 46) + dome(845, 1640, 40, 46);
-    s += el('rect', Object.assign({ x: 386, y: 1606, width: 228, height: 224 }, ln));
-    s += P('M452 1830 L452 1730 C452 1694 476 1676 500 1666 C524 1676 548 1694 548 1730 L548 1830Z', 'rgba(201, 139, 104, 0.24)', { stroke: '#B48A3C', 'stroke-width': 1.5 });
-    s += S('M466 1830 L466 1734 C466 1706 484 1692 500 1684 C516 1692 534 1706 534 1734 L534 1830', '#B48A3C', 1);
-    s += arches(392, 448, 1700, 40, 1) + arches(552, 608, 1700, 40, 1) + arches(392, 448, 1790, 40, 1) + arches(552, 608, 1790, 40, 1);
-    s += S('M380 1606 L620 1606 M386 1640 L614 1640', '#B48A3C', 1.4);
-    s += dome(500, 1606, 150, 110) + chhatri(404, 1606, 34) + chhatri(596, 1606, 34);
-    s += S('M110 1830 L890 1830', '#B48A3C', 2);
+    s += S('M90 ' + (y + 52) + ' L910 ' + (y + 52), 'url(#cd-gold)', 2.4);
+    [170, 330, 670, 830].forEach(function (cx) {
+      s += P('M' + (cx - 16) + ' ' + (y + 53) + ' L' + (cx + 16) + ' ' + (y + 53) + ' C' + (cx + 14) + ' ' + (y + 70) + ' ' + (cx + 6) + ' ' + (y + 82) + ' ' + cx + ' ' + (y + 90) + ' C' + (cx - 6) + ' ' + (y + 82) + ' ' + (cx - 14) + ' ' + (y + 70) + ' ' + (cx - 16) + ' ' + (y + 53) + 'Z', 'url(#cd-gold)');
+    });
+    [[150, 462], [538, 850]].forEach(function (p) {
+      var mid = (p[0] + p[1]) / 2, w = p[1] - p[0];
+      s += el('rect', { x: p[0], y: 1746, width: w, height: 90, rx: 4, fill: 'rgba(255, 246, 234, 0.4)', stroke: '#B48A3C', 'stroke-width': 1.6 });
+      s += el('rect', { x: p[0] + 10, y: 1756, width: w - 20, height: 70, rx: 2, fill: 'none', stroke: '#B48A3C', 'stroke-width': 0.8, opacity: 0.7 });
+      s += rosette(mid, 1791, 15);
+      [52, 90, 128].forEach(function (d) { s += C(mid - d, 1791, 5, 'url(#cd-stud)') + C(mid + d, 1791, 5, 'url(#cd-stud)'); });
+    });
     return s;
   }
 
-  // The doors: wine lacquer, a gold jaali, a cusped arch, paisleys and the palace in gold line.
+  // The doors: sandstone with a faint jaali, a cusped arch, paisleys, the lotus mandala across the
+  // middle, and the carved ledge and studded panels at the foot.
   function doors() {
     var s = '<svg viewBox="0 0 1000 1900" preserveAspectRatio="none" aria-hidden="true" focusable="false">';
     s += el('rect', { width: 1000, height: 1900, fill: 'url(#cd-wine)' });
@@ -431,34 +464,31 @@ window.FIGURES = (function () {
     // Paisleys in the spandrels.
     s += paisley(150, 340, 0.95, false) + paisley(850, 340, 0.95, true);
     // Corner rosettes.
-    [[58, 58], [942, 58], [58, 1842], [942, 1842]].forEach(function (c) {
-      for (var p = 0; p < 8; p++) {
-        var an = p * Math.PI / 4;
-        s += el('ellipse', { cx: n(c[0] + Math.cos(an) * 9), cy: n(c[1] + Math.sin(an) * 9), rx: 6, ry: 3, fill: '#B48A3C', opacity: 0.8, transform: 'rotate(' + n(an * 180 / Math.PI) + ' ' + n(c[0] + Math.cos(an) * 9) + ' ' + n(c[1] + Math.sin(an) * 9) + ')' });
-      }
-      s += C(c[0], c[1], 4, '#CFA453');
-    });
-    s += palaceLine();
-    // The seam where the two doors meet.
-    s += el('rect', { x: 498, y: 40, width: 4, height: 1820, fill: '#B98564', opacity: 0.55 });
-    s += S('M494 40 L494 1860 M506 40 L506 1860', '#B48A3C', 1, { opacity: 0.45 });
+    [[58, 58], [942, 58], [58, 1842], [942, 1842]].forEach(function (c) { s += rosette(c[0], c[1], 9); });
+    // The seam where the two doors meet, broken where the mandala's plain centre carries the names.
+    var gapA = MC[1] - 238, gapB = MC[1] + 238;
+    s += el('rect', { x: 498, y: 40, width: 4, height: gapA - 40, fill: '#B98564', opacity: 0.55 }) + el('rect', { x: 498, y: gapB, width: 4, height: 1860 - gapB, fill: '#B98564', opacity: 0.55 });
+    s += S('M494 40 L494 ' + gapA + ' M506 40 L506 ' + gapA + ' M494 ' + gapB + ' L494 1860 M506 ' + gapB + ' L506 1860', '#B48A3C', 1, { opacity: 0.45 });
+    s += mandala() + ledge();
     return s + '</svg>';
+  }
+
+  // A marigold, as strung in the toran and heaped at the kalash.
+  function marigold(x, y, r, tone) {
+    var t = '';
+    t += C(x, y, r, tone ? '#E9850E' : '#E8A10E');
+    for (var p = 0; p < 10; p++) {
+      var an = p * Math.PI / 5;
+      t += C(x + Math.cos(an) * r * 0.72, y + Math.sin(an) * r * 0.72, n(r * 0.34), tone ? '#F7A529' : '#F7C437');
+    }
+    t += C(x, y, n(r * 0.42), tone ? '#FBBE4A' : '#FCD970') + C(x, y, n(r * 0.16), '#B65E07', { opacity: 0.6 });
+    return t;
   }
 
   // A toran of mango leaves and marigolds across the top of the doors.
   function toran() {
     var s = '<svg viewBox="0 0 1000 190" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">';
     function rope(t) { return [-20 + 1040 * t, 24 + 30 * t * (1 - t)]; }
-    function marigold(x, y, r, tone) {
-      var t = '';
-      t += C(x, y, r, tone ? '#E9850E' : '#E8A10E');
-      for (var p = 0; p < 10; p++) {
-        var an = p * Math.PI / 5;
-        t += C(x + Math.cos(an) * r * 0.72, y + Math.sin(an) * r * 0.72, n(r * 0.34), tone ? '#F7A529' : '#F7C437');
-      }
-      t += C(x, y, n(r * 0.42), tone ? '#FBBE4A' : '#FCD970') + C(x, y, n(r * 0.16), '#B65E07', { opacity: 0.6 });
-      return t;
-    }
     var leaves = '', flowers = '', strands = '';
     for (var k = 0; k <= 26; k++) {
       var t = k / 26, p = rope(t), len = 64 + (k % 2) * 16, ang = (k % 2 ? 4 : -4);
@@ -477,23 +507,67 @@ window.FIGURES = (function () {
     return s + '</svg>';
   }
 
-  // The plaque: Ganesha above the couple's monogram, between two peacocks perched on a ledge.
-  function crest(ganeshaSvg, initials) {
-    var s = '<svg viewBox="0 0 1000 700" aria-hidden="true" focusable="false" overflow="visible">';
-    s += peacock(250, 432, 0.78, true) + peacock(750, 432, 0.78, false);
-    s += P('M150 430 L850 430 L838 446 L162 446Z', 'url(#cd-gold)');
-    [320, 500, 680].forEach(function (x) { s += P('M' + (x - 14) + ' 446 L' + (x + 14) + ' 446 C' + (x + 10) + ' 462 ' + (x + 2) + ' 470 ' + x + ' 474 C' + (x - 2) + ' 470 ' + (x - 10) + ' 462 ' + (x - 14) + ' 446Z', 'url(#cd-gold)'); });
-    var body = 'M390 430 L390 250 C390 232 400 222 414 220 L586 220 C600 222 610 232 610 250 L610 430Z';
-    var dome = 'M400 224 C400 170 450 140 480 120 C492 112 498 100 500 86 C502 100 508 112 520 120 C550 140 600 170 600 224Z';
-    s += P(dome, 'url(#cd-ivory)', { stroke: 'url(#cd-gold)', 'stroke-width': 3 }) + P(body, 'url(#cd-ivory)', { stroke: 'url(#cd-gold)', 'stroke-width': 3 });
-    s += P('M404 420 L404 254 C404 242 410 236 420 234 L580 234 C590 236 596 242 596 254 L596 420Z', 'none', { stroke: '#C9A04B', 'stroke-width': 1.2 });
-    s += P('M492 86 C492 74 508 74 508 86 Z M496 74 C496 62 504 62 504 74Z', 'url(#cd-gold)') + S('M500 62 L500 46', '#C9A04B', 2) + C(500, 44, 3, '#C9A04B');
-    s += ganeshaSvg.replace('<svg ', '<svg x="458" y="128" width="84" height="84" color="#86601C"');
-    s += el('text', { x: 500, y: 352, 'text-anchor': 'middle', 'font-family': 'Cinzel, serif', 'font-size': 92, 'font-weight': 500, fill: '#6A1426', 'letter-spacing': 6 }, initials[0] + '<tspan fill="#B8892E" font-size="40" dy="-16" dx="10">&#x2726;</tspan><tspan dy="16" dx="10">' + initials[1] + '</tspan>');
-    s += S('M440 384 L480 384 M520 384 L560 384', '#C9A04B', 1.4);
-    s += P('M500 372 C495 378 495 390 500 396 C505 390 505 378 500 372Z', '#B8892E') + P('M500 396 C492 394 486 388 484 382 C491 383 497 388 500 396Z M500 396 C508 394 514 388 516 382 C509 383 503 388 500 396Z', '#B8892E', { opacity: 0.7 });
+  // Ganesha in a lotus medallion under the toran, set on the point of the arch.
+  function crest(ganeshaSvg) {
+    var cx = 500, cy = 80, k;
+    var s = '<svg viewBox="0 0 1000 170" aria-hidden="true" focusable="false" overflow="visible">';
+    for (k = 0; k < 16; k++) {
+      s += P('M' + (cx - 11) + ' ' + (cy - 54) + ' C' + (cx - 11) + ' ' + (cy - 62) + ' ' + (cx - 5) + ' ' + (cy - 68) + ' ' + cx + ' ' + (cy - 73) + ' C' + (cx + 5) + ' ' + (cy - 68) + ' ' + (cx + 11) + ' ' + (cy - 62) + ' ' + (cx + 11) + ' ' + (cy - 54) + 'Z',
+        'url(#cd-ivory)', { stroke: '#B48A3C', 'stroke-width': 1.2, transform: 'rotate(' + (k * 22.5) + ' ' + cx + ' ' + cy + ')' });
+    }
+    s += C(cx, cy, 56, 'url(#cd-ivory)', { stroke: 'url(#cd-gold)', 'stroke-width': 3 });
+    s += C(cx, cy, 48, 'none', { stroke: '#C9A04B', 'stroke-width': 1 });
+    s += ganeshaSvg.replace('<svg ', '<svg x="' + (cx - 36) + '" y="' + (cy - 38) + '" width="72" height="72" color="#7A5518"').replace('stroke-width="2.4"', 'stroke-width="3.6"');
     return s + '</svg>';
   }
 
-  return { defs: defs, peacock: peacock, couple: coupleGroup, doors: doors, toran: toran, crest: crest, flora: flora };
+  // A brass kalash on the ledge: mango leaves, a coconut, a sacred thread and a kumkum band,
+  // with marigolds at its foot. Drawn standing on (0, 0).
+  function kalash() {
+    var s = '', k;
+    s += el('ellipse', { cx: 0, cy: -2, rx: 74, ry: 7, fill: '#3A1E10', opacity: 0.22, filter: 'url(#p-blur4)' });
+    [-58, -44, 44, 58].forEach(function (x, i) { s += marigold(x, -9, 10, i % 2); });
+    s += marigold(-50, -24, 9, 0) + marigold(50, -24, 9, 1);
+    s += P('M-26 0 L26 0 L20 -11 L-20 -11Z', 'url(#p-goldmetal)');
+    var pot = 'M-22 -11 C-64 -16 -66 -80 -30 -94 L30 -94 C66 -80 64 -16 22 -11Z';
+    s += P(pot, 'url(#cd-brass)');
+    s += P('M-38 -30 C-50 -46 -46 -72 -28 -86 C-38 -70 -42 -52 -38 -30Z', '#FFF4D0', { opacity: 0.45 });
+    s += S('M-57 -54 Q0 -42 57 -54', '#B8323A', 6) + S('M-58 -61 Q0 -49 58 -61 M-56 -47 Q0 -35 56 -47', '#E8C36A', 1.4);
+    for (k = -4; k <= 4; k++) s += C(k * 12, -48 + Math.abs(k) * 0.4 - (k * k) * 0.1, 1.6, '#FFF1C9');
+    s += P('M-24 -94 L24 -94 L19 -110 L-19 -110Z', 'url(#cd-brass)');
+    s += S('M-22 -99 L22 -99', '#C8283A', 2.6) + S('M-21 -103.5 L21 -103.5', '#E8A10E', 2);
+    // Mango leaves fanning out of the mouth.
+    [-66, -42, -18, 18, 42, 66].forEach(function (a, i) {
+      s += g({ transform: 'translate(0 -112) rotate(' + a + ')' },
+        P('M0 0 C11 -14 11 -40 0 -58 C-11 -40 -11 -14 0 0Z', 'url(#cd-leaf)') + S('M0 -4 L0 -52', '#A9C98A', 1, { opacity: 0.65 }));
+    });
+    s += el('ellipse', { cx: 0, cy: -112, rx: 36, ry: 7, fill: 'url(#p-goldmetal)' });
+    s += el('ellipse', { cx: 0, cy: -138, rx: 24, ry: 28, fill: 'url(#cd-coconut)' });
+    s += S('M-6 -163 C-2 -174 -4 -182 -9 -188 M2 -165 C4 -176 8 -182 12 -186 M-1 -164 C0 -176 0 -182 -1 -190', '#5C381F', 1.8);
+    s += S('M-22 -128 Q0 -120 22 -128', '#C8283A', 2.2) + S('M-21 -124 Q0 -116 21 -124', '#E8A10E', 1.6);
+    return s;
+  }
+
+  // A clay diya, its spout to the right, standing on (0, 0).
+  function diya(i) {
+    var s = '';
+    s += C(28, -32, 44, 'url(#cd-halo)', { class: 'flicker', style: 'animation-delay:' + (-0.5 * i) + 's' });
+    s += P('M-26 -14 C-24 0 -10 3 2 3 C16 3 26 -2 34 -15 C20 -9 -12 -9 -26 -14Z', '#B4572E');
+    s += S('M-24 -14 C-10 -10 18 -10 32 -15', '#E0A15C', 2);
+    s += P('M28 -50 C37 -36 35 -21 28 -17 C21 -21 19 -36 28 -50Z', 'url(#cd-flame)', { class: 'flame', style: 'animation-delay:' + (-0.3 * i) + 's' });
+    return s;
+  }
+
+  // On the ledge at the foot of the doors: two peacocks facing the kalash, with a diya either side.
+  // The drawing starts at y 1300 of the doors, so the ledge top (1640) is at 340.
+  function base() {
+    var y = LEDGE - 1300;
+    var s = '<svg viewBox="0 0 1000 600" aria-hidden="true" focusable="false" overflow="visible">';
+    s += peacock(232, y, 0.78, true) + peacock(768, y, 0.78, false);
+    s += g({ transform: 'translate(388 ' + y + ')' }, diya(0)) + g({ transform: 'translate(612 ' + y + ') scale(-1 1)' }, diya(1));
+    s += g({ transform: 'translate(500 ' + y + ')' }, kalash());
+    return s + '</svg>';
+  }
+
+  return { defs: defs, peacock: peacock, couple: coupleGroup, doors: doors, toran: toran, crest: crest, base: base, flora: flora };
 })();

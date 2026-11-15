@@ -284,7 +284,8 @@
       }
       $('.cover-petals', cover).innerHTML = petals;
     }
-    $('.cover-crest', cover).innerHTML = FIGURES.crest(ART.ganesha(), [bride.en.charAt(0), groom.en.charAt(0)]);
+    $('.cover-crest', cover).innerHTML = FIGURES.crest(ART.ganesha());
+    $('.cover-base', cover).innerHTML = FIGURES.base();
   }
 
   var MOVING = $$('.layer[data-p]').map(function (el) { return { el: el, p: parseFloat(el.dataset.p) }; });
