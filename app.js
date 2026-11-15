@@ -70,6 +70,7 @@
       call: 'Call', whatsapp: 'WhatsApp',
       waText: 'Namaste, we will be happy to join the wedding of Jeeya & Smit.',
       replay: 'Watch again', swipe: 'Swipe to continue', step: 'Step', of: 'of',
+      autoPause: 'Pause the slideshow', autoPlay: 'Play the slideshow',
       labels: ['Save the date', 'Shri Ganesh', 'The invitation', "The bride's family", "The groom's family", '9 December', '11 December', '12 December', 'Venue and countdown', 'With love', 'Awaiting you'],
     },
     hi: {
@@ -82,6 +83,7 @@
       call: 'कॉल करें', whatsapp: 'व्हाट्सऐप',
       waText: 'नमस्ते, हम जिया एवं स्मित के विवाह में अवश्य पधारेंगे।',
       replay: 'फिर से देखें', swipe: 'आगे देखने के लिए स्वाइप करें', step: 'पृष्ठ', of: '/',
+      autoPause: 'स्लाइड रोकें', autoPlay: 'स्लाइड चलाएँ',
       labels: ['शुभ विवाह', 'श्री गणेश', 'निमंत्रण', 'वधु पक्ष', 'वर पक्ष', '9 दिसम्बर', '11 दिसम्बर', '12 दिसम्बर', 'निमंत्रित स्थल', 'स्नेह सहित', 'आपकी प्रतीक्षा में'],
     },
   };
@@ -318,6 +320,7 @@
     story.classList.toggle('lang-hi', LANG === 'hi');
     langBtns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === LANG ? 'true' : 'false'); });
     $('span', hint).textContent = T('swipe');
+    if (autoBtn) autoBtn.setAttribute('aria-label', T(autoOn ? 'autoPause' : 'autoPlay'));
     if (!rerender) return;
     if (pan) endPan();
     renderPanels();
@@ -325,6 +328,7 @@
       void panels[cur].offsetWidth;
       setPanel(cur, 'active');
       updateChrome(cur);
+      startTimer(cur);
     }
     tick();
   }
@@ -421,7 +425,7 @@
   function updateChrome(i) {
     segs.forEach(function (seg, k) {
       seg.classList.toggle('is-done', k < i);
-      seg.classList.remove('is-current');
+      seg.classList.remove('is-current', 'is-timing');
     });
     void segs[i].offsetWidth;
     segs[i].classList.add('is-current');
@@ -443,7 +447,45 @@
     panels.forEach(function (el, k) { if (k !== i) setPanel(k, 'off'); });
     if (showText !== false) setPanel(i, 'active');
     updateChrome(i);
+    if (showText !== false) startTimer(i);
   }
+
+  /* ----------------------------------------------------------
+     Auto-advance. Each scene stays up long enough to read it (longer
+     scenes stay longer) while its bar in the top strip fills, then the
+     camera moves on to the next one. Pressing and holding the screen
+     pauses it; the pause button in the top bar stops it.
+     ---------------------------------------------------------- */
+  var autoOn = true;
+  var autoBtn = $('#auto');
+
+  function dwell(i) {
+    var chars = panels[i].textContent.replace(/\s+/g, ' ').trim().length;
+    return Math.round(clamp(4000 + chars * 30, 6500, 15000));
+  }
+
+  function startTimer(i) {
+    segs.forEach(function (seg) { seg.classList.remove('is-timing'); });
+    if (!autoOn || !opened || i < 0 || i >= N - 1) return;
+    segs[i].style.setProperty('--dwell', dwell(i) + 'ms');
+    void segs[i].offsetWidth;
+    segs[i].classList.add('is-timing');
+  }
+
+  function setAuto(on) {
+    autoOn = on;
+    story.classList.toggle('auto-off', !on);
+    autoBtn.setAttribute('data-on', on ? 'true' : 'false');
+    autoBtn.setAttribute('aria-label', T(on ? 'autoPause' : 'autoPlay'));
+    if (on && !pan && !intro) startTimer(cur);
+    if (!on) segs.forEach(function (seg) { seg.classList.remove('is-timing'); });
+  }
+
+  progressEl.addEventListener('animationend', function (e) {
+    var seg = e.target.parentNode;
+    if (!seg.classList.contains('is-timing') || segs.indexOf(seg) !== cur || pan || intro) return;
+    go(cur + 1);
+  });
 
   function renderPan(e) {
     var off = -pan.dir * e * 1000;
@@ -539,6 +581,7 @@
     if (reduced) {
       setZoom(1, false);
       setPanel(startIndex, 'active');
+      startTimer(startIndex);
       return;
     }
     void world.offsetWidth;
@@ -560,6 +603,7 @@
     intro.timers.forEach(clearTimeout);
     intro = null;
     setPanel(cur, 'active');
+    startTimer(cur);
     if (!moved && cur === 0) setTimeout(function () { if (!moved && cur === 0) hint.classList.add('is-on'); }, 2600);
   }
 
@@ -775,6 +819,7 @@
   });
 
   document.addEventListener('visibilitychange', function () {
+    story.classList.toggle('auto-away', document.hidden);
     if (!audio) return;
     if (document.hidden) { wasPlaying = !audio.paused; audio.pause(); }
     else if (wasPlaying) playMusic();
@@ -858,6 +903,7 @@
   });
   prevBtn.addEventListener('click', function () { step(-1); });
   nextBtn.addEventListener('click', function () { step(1); });
+  autoBtn.addEventListener('click', function () { setAuto(!autoOn); });
 
   panelsEl.addEventListener('click', function (e) {
     if (e.target.closest('#save-dates')) downloadICS();
@@ -870,7 +916,10 @@
     if (!opened || e.target.closest('a, button')) return;
     tracking = true;
     sx = e.clientX; sy = e.clientY; st = Date.now();
+    story.classList.add('auto-hold');
   });
+  window.addEventListener('pointerup', function () { story.classList.remove('auto-hold'); });
+  window.addEventListener('pointercancel', function () { story.classList.remove('auto-hold'); });
   story.addEventListener('pointerup', function (e) {
     if (!tracking) return;
     tracking = false;

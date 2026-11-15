@@ -533,7 +533,13 @@ button { font: inherit; color: inherit; }
 .seg.is-done { opacity: 0.7; }
 .seg.is-done i { transform: scaleX(1); }
 .seg.is-current { opacity: 0.4; }
-.seg.is-current i { transform: scaleX(1); transition: transform 0.9s ease; }
+/* The current scene's bar fills while it is on screen, then the next scene comes up. */
+.seg.is-current i { transform: scaleX(0); }
+.seg.is-timing i { animation: seg-fill var(--dwell, 8s) linear forwards; }
+.story.auto-hold .seg.is-timing i, .story.auto-away .seg.is-timing i { animation-play-state: paused; }
+.story.auto-off .seg.is-current i, .seg.is-current:last-child i { transform: scaleX(1); transition: transform 0.9s ease; }
+@keyframes seg-fill { to { transform: scaleX(1); } }
+#auto[data-on="true"] .ic-play, #auto[data-on="false"] .ic-pause { display: none; }
 .chrome-row { display: flex; align-items: center; justify-content: space-between; height: 40px; }
 .mono { font-family: var(--caps); font-size: 13px; letter-spacing: 0.18em; }
 .icon-btn {
