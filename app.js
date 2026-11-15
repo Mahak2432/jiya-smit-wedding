@@ -785,6 +785,11 @@
 
   // The first track in the list that loads is used, so a song added later takes over from the default.
   var tracks = [].concat(W.music.src);
+  var startAt = W.music.startAt || 0;
+  // Jump past the silent opening, both on first play and each time the loop wraps back to 0.
+  function skipIntro(a) {
+    if (startAt && a.duration > startAt && a.currentTime < startAt - 0.05) a.currentTime = startAt;
+  }
   function loadTrack(i) {
     try {
       var a = new Audio(tracks[i]);
@@ -797,6 +802,8 @@
         if (i + 1 < tracks.length) { loadTrack(i + 1); if (resume) playMusic(); }
         else { audio = null; musicBtn.hidden = true; }
       });
+      a.addEventListener('loadedmetadata', function () { skipIntro(a); });
+      a.addEventListener('timeupdate', function () { skipIntro(a); });
       a.addEventListener('play', function () { setMusicUI(true); });
       a.addEventListener('pause', function () { setMusicUI(false); });
       audio = a;
@@ -810,6 +817,7 @@
 
   function playMusic() {
     if (!audio) return;
+    skipIntro(audio);
     var pr = audio.play();
     if (pr && pr.catch) pr.catch(function () { setMusicUI(false); });
   }
