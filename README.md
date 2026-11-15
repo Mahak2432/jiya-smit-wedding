@@ -1,4 +1,4 @@
-# Jiya & Smit · Shubh Vivah (wedding invitation website)
+# Jeeya & Smit · Shubh Vivah (wedding invitation website)
 
 An illustrated, story-style wedding invitation made for phones, in the style of a Rajasthani palace video invite.
 
@@ -6,7 +6,7 @@ An illustrated, story-style wedding invitation made for phones, in the style of 
 
 1. **The opening.** A monogram crest draws itself on ivory paper with watercolour roses. When the guest taps "Open the invitation", the music starts.
 2. **The camera pulls back.** The monogram turns out to be painted in the sky of a carved sandstone arch, with a garden, a balustrade, a peacock and a lily pool.
-3. **Save the date.** Butterflies fly in and form a heart, the couple walks in hand in hand, and "Save the date, Jiya & Smit" appears in gold.
+3. **Save the date.** Butterflies fly in and form a heart, the couple walks in hand in hand, and "Save the date, Jeeya & Smit" appears in gold.
 4. **Swiping walks along the palace.** Each swipe pans the camera to the next arch, with a parallax garden behind. The time of day moves on as the story goes, and each arch holds one part of the card:
    1. Save the date (day)
    2. Shri Ganesh blessing, with temple bells (dawn)

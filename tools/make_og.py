@@ -81,7 +81,7 @@ def text_block(img):
     f_line = font(FONT_SERIF, 40)
     f_small = font(FONT_SERIF, 34)
 
-    draw.text((left, 160), "Jiya & Smit", font=f_names, fill=INK)
+    draw.text((left, 160), "Jeeya & Smit", font=f_names, fill=INK)
     draw.text((left + 4, 318), "Shubh Vivah", font=f_sub, fill=INK_SOFT)
     draw.line((left + 4, 402, left + 300, 402), fill=GOLD, width=2)
     draw.text((left + 4, 428), "Saturday, 12 December 2026", font=f_line, fill=INK)

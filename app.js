@@ -54,153 +54,191 @@
   });
 
   /* ----------------------------------------------------------
+     Language. The invitation opens in English; guests can switch to Hindi
+     from the EN / हिं switch in the top bar, and a shared link can start in
+     Hindi with ?lang=hi.
+     ---------------------------------------------------------- */
+  var UI = {
+    en: {
+      saveA: 'Save', saveThe: 'the', saveB: 'Date',
+      celebrate: 'To celebrate the wedding of',
+      venueKicker: 'The celebrations are at',
+      units: ['Days', 'Hours', 'Mins', 'Secs'],
+      until: 'until the Ashirwad Samaroh, 7:15 PM on 12 December',
+      begun: 'The celebration has begun',
+      maps: 'Open in maps', saveDates: 'Save the dates',
+      call: 'Call', whatsapp: 'WhatsApp',
+      waText: 'Namaste, we will be happy to join the wedding of Jeeya & Smit.',
+      replay: 'Watch again', swipe: 'Swipe to continue', step: 'Step', of: 'of',
+      labels: ['Save the date', 'Shri Ganesh', 'The invitation', "The bride's family", "The groom's family", '9 December', '11 December', '12 December', 'Venue and countdown', 'With love', 'Awaiting you'],
+    },
+    hi: {
+      shubh: 'शुभ विवाह', sang: 'संग',
+      venueKicker: 'निमंत्रित स्थल',
+      units: ['दिन', 'घंटे', 'मिनट', 'सेकंड'],
+      until: 'आशीर्वाद समारोह तक, 12 दिसम्बर, सायं 7.15 बजे',
+      begun: 'समारोह आरम्भ हो चुका है',
+      maps: 'नक्शे में देखें', saveDates: 'कैलेंडर में जोड़ें',
+      call: 'कॉल करें', whatsapp: 'व्हाट्सऐप',
+      waText: 'नमस्ते, हम जिया एवं स्मित के विवाह में अवश्य पधारेंगे।',
+      replay: 'फिर से देखें', swipe: 'आगे देखने के लिए स्वाइप करें', step: 'पृष्ठ', of: '/',
+      labels: ['शुभ विवाह', 'श्री गणेश', 'निमंत्रण', 'वधु पक्ष', 'वर पक्ष', '9 दिसम्बर', '11 दिसम्बर', '12 दिसम्बर', 'निमंत्रित स्थल', 'स्नेह सहित', 'आपकी प्रतीक्षा में'],
+    },
+  };
+  var LANG = /[?&]lang=hi\b/.test(location.search) ? 'hi' : 'en';
+  function L(v) { return v && typeof v === 'object' && !Array.isArray(v) ? (v[LANG] !== undefined ? v[LANG] : v.en) : v; }
+  function T(key) { return UI[LANG][key]; }
+
+  /* ----------------------------------------------------------
      Scene content
      ---------------------------------------------------------- */
+  // A fine gold rule with a diamond, as in the first design.
   var ORN = '<div class="orn rv" aria-hidden="true"><i></i></div>';
-  function hi(cls, text) { return '<p class="' + cls + ' rv" lang="hi">' + esc(text) + '</p>'; }
-  function p(cls, text) { return '<p class="' + cls + ' rv">' + esc(text) + '</p>'; }
+  function line(cls, text) { return '<p class="' + cls + ' rv">' + esc(text) + '</p>'; }
   var bride = W.couple.bride, groom = W.couple.groom;
+  function town() { return L(W.wedding.city).split(/[,(]/)[0].trim(); }
+  var HI = function () { return LANG === 'hi'; };
+
+  function coupleNames() {
+    if (HI()) {
+      return '<h2 class="names rv" aria-label="' + esc(bride.hi + ' ' + T('sang') + ' ' + groom.hi) + '">' +
+        esc(bride.hi) + ' <span class="sang">' + T('sang') + '</span> ' + esc(groom.hi) + '</h2>';
+    }
+    return '<h2 class="names rv" aria-label="' + esc(bride.en + ' and ' + groom.en) + '">' +
+      esc(bride.en) + ' <span class="amp">&amp;</span> ' + esc(groom.en) + '</h2>';
+  }
 
   function sceneHero() {
-    return '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>' +
-      '<p class="std rv">Save <span class="the">the</span> Date</p>' +
-      p('caps-sm gap-sm', 'To celebrate the wedding of') +
-      '<h2 class="names rv" aria-label="' + esc(bride.name + ' and ' + groom.name) + '">' + esc(bride.name) + ' <span class="amp">&amp;</span> ' + esc(groom.name) + '</h2>' +
-      p('caps', W.wedding.dateLine) +
-      p('caps-sm', W.wedding.venue + ', ' + W.wedding.city.split(',')[0]);
+    var s = '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>';
+    if (HI()) s += line('hi-title', T('shubh')) + coupleNames();
+    else s += '<p class="std rv">' + T('saveA') + ' <span class="the">' + T('saveThe') + '</span> ' + T('saveB') + '</p>' + line('caps-sm gap-sm', T('celebrate')) + coupleNames();
+    return s + line('caps', L(W.wedding.date)) + line('caps-sm', L(W.wedding.venue) + ', ' + town());
   }
 
   function sceneBlessing() {
     var B = W.blessing;
-    return '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>' +
-      hi('hi-title', B.hindi) +
-      ORN +
-      B.shloka.map(function (line) { return hi('hi-verse', line); }).join('') +
-      p('en-it gap-sm', B.shlokaEn) +
-      ORN +
-      hi('hi-quote', W.invitation.quote);
+    var s = '<div class="ganesha-wrap rv">' + ART.ganesha() + '</div>';
+    if (HI()) {
+      s += line('hi-title', B.title.hi) + ORN + B.shloka.hi.map(function (l) { return line('hi-verse', l); }).join('') + ORN + line('hi-quote', B.quote.hi);
+    } else {
+      s += line('title-en', B.title.en) + ORN + B.shloka.en.map(function (l) { return line('verse-en', l); }).join('') +
+        line('en-it gap-sm', B.meaning.en) + ORN + line('en-it', B.quote.en);
+    }
+    return s;
   }
 
   // The invitation itself unrolls on a paper scroll hanging in the arch.
   function sceneInvitation() {
     var I = W.invitation;
+    var inner = HI()
+      ? line('hi-label', I.salutation.hi) + line('hi-body gap-sm', I.body.hi) + ORN + line('hi-sign', W.closing.signed.hi)
+      : line('en-label', I.salutation.en) + line('en-body gap-sm', I.body.en) + ORN + line('en-it', W.closing.signed.en);
     return '<div class="scroll rv">' +
         '<div class="scroll-rod"></div>' +
-        '<div class="scroll-body"><div class="scroll-paper">' +
-          hi('hi-label', I.salutation) +
-          hi('hi-body gap-sm', I.hindi) +
-          ORN +
-          p('en-it', I.english) +
-        '</div></div>' +
+        '<div class="scroll-body"><div class="scroll-paper">' + inner + '</div></div>' +
         '<div class="scroll-rod"></div>' +
       '</div>';
   }
 
-  function sceneFamily(f, person, extra) {
-    return hi('hi-label', f.side) +
-      '<h2 class="script rv">' + esc(person.name) + '</h2>' +
-      hi('hi-name', f.nameHindi) +
+  function sceneFamily(f, extra) {
+    return line(HI() ? 'hi-label' : 'en-label', L(f.side)) +
+      '<h2 class="script rv">' + esc(L(f.title)) + '</h2>' +
       ORN +
-      f.lines.map(function (line) { return p('en', line); }).join('') +
-      p('caps-sm gap', f.firm) +
+      L(f.lines).map(function (l) { return line('en', l); }).join('') +
+      line('caps-sm gap', L(f.firm)) +
       (extra || '');
   }
 
   function sceneDay(d) {
     var rows = d.events.map(function (ev) {
       return '<li class="ev rv' + (ev.main ? ' is-main' : '') + '">' +
-        '<time>' + esc(ev.time) + '</time>' +
-        '<span class="ev-hi" lang="hi">' + esc(ev.hindi) + '</span>' +
-        '<span class="ev-en">' + esc(ev.english) + '</span>' +
+        '<time>' + esc(L(ev.time)) + '</time>' +
+        '<span class="ev-name">' + esc(L(ev.name)) + '</span>' +
       '</li>';
     }).join('');
-    return p('caps-sm', d.weekday) +
+    return line('caps-sm', L(d.weekday)) +
       '<p class="day-num rv">' + esc(d.day) + '</p>' +
-      p('caps', d.month) +
-      p('place', d.place) +
+      line('caps', L(d.month)) +
+      line('place', L(d.place)) +
       ORN +
       '<ol class="events">' + rows + '</ol>';
   }
 
   function sceneVenue() {
-    var units = [['days', 'Days'], ['hours', 'Hours'], ['minutes', 'Mins'], ['seconds', 'Secs']].map(function (u) {
-      return '<div><strong data-unit="' + u[0] + '">00</strong><span>' + u[1] + '</span></div>';
+    var u = T('units');
+    var units = [['days', u[0]], ['hours', u[1]], ['minutes', u[2]], ['seconds', u[3]]].map(function (x) {
+      return '<div><strong data-unit="' + x[0] + '">00</strong><span>' + x[1] + '</span></div>';
     }).join('');
-    return hi('hi-label', 'निमंत्रित स्थल') +
-      '<h2 class="script rv">' + esc(W.wedding.venue) + '</h2>' +
-      p('caps-sm', W.wedding.city) +
+    return line(HI() ? 'hi-label' : 'en-label', T('venueKicker')) +
+      '<h2 class="script rv">' + esc(L(W.wedding.venue)) + '</h2>' +
+      line('caps-sm', L(W.wedding.city)) +
       ORN +
-      '<div class="count rv" id="count" role="timer" aria-label="Time until the Ashirwad Samaroh">' + units + '</div>' +
-      '<p class="en-it rv" id="count-done" hidden>The celebration has begun</p>' +
-      p('en-it', 'until the Ashirwad Samaroh, 7:15 PM on 12 December') +
+      '<div class="count rv" id="count" role="timer" aria-label="' + esc(T('until')) + '">' + units + '</div>' +
+      '<p class="en-it rv" id="count-done" hidden>' + esc(T('begun')) + '</p>' +
+      line('en-it', T('until')) +
       '<div class="pills rv">' +
-        '<a class="pill" href="' + esc(W.wedding.mapUrl) + '" target="_blank" rel="noopener">Open in maps</a>' +
-        '<button class="pill" id="save-dates" type="button">Save the dates</button>' +
+        '<a class="pill" href="' + esc(W.wedding.mapUrl) + '" target="_blank" rel="noopener">' + esc(T('maps')) + '</a>' +
+        '<button class="pill" id="save-dates" type="button">' + esc(T('saveDates')) + '</button>' +
       '</div>';
   }
 
   function sceneGreetings() {
     var G = W.guests;
-    function block(group, gloss, inline) {
+    function block(group, inline) {
+      var list = L(group.names);
       return '<div class="gblock rv">' +
-        '<p class="hi-label" lang="hi">' + esc(group.hindi) + '</p>' +
-        '<p class="gloss">' + esc(gloss) + '</p>' +
+        '<p class="' + (HI() ? 'hi-label' : 'en-label') + '">' + esc(L(group.title)) + '</p>' +
         (inline
-          ? '<p class="gline">' + esc(group.names.join(', ')) + '</p>'
-          : '<ul class="glist">' + group.names.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>') +
+          ? '<p class="gline">' + esc(list.join(', ')) + '</p>'
+          : '<ul class="glist">' + list.map(function (nm) { return '<li>' + esc(nm) + '</li>'; }).join('') + '</ul>') +
       '</div>';
     }
-    return block(G.darshan, 'Looking forward to seeing you') +
-      block(G.special, 'With a special request') +
-      block(G.sweet, 'A sweet invitation from', true) +
-      p('en-sm gap', G.ladies);
+    return block(G.darshan) + block(G.special) + block(G.sweet, true) + line('en-sm gap', L(G.ladies));
   }
 
   function sceneClosing() {
     var C = W.closing;
     var calls = W.contacts.map(function (c) {
-      return '<a class="pill" href="tel:' + esc(c.tel) + '">Call ' + esc(c.display) + '</a>';
+      return '<a class="pill" href="tel:' + esc(c.tel) + '">' + esc(T('call')) + ' ' + esc(c.display) + '</a>';
     }).join('');
     var whatsapp = W.contacts[0]
-      ? '<a class="pill" href="https://wa.me/' + esc(W.contacts[0].wa) + '?text=' +
-          encodeURIComponent('Namaste, we will be happy to join the wedding of ' + bride.name + ' & ' + groom.name + '.') +
-          '" target="_blank" rel="noopener">WhatsApp</a>'
+      ? '<a class="pill" href="https://wa.me/' + esc(W.contacts[0].wa) + '?text=' + encodeURIComponent(T('waText')) + '" target="_blank" rel="noopener">' + esc(T('whatsapp')) + '</a>'
       : '';
-    return hi('hi-title', C.hindi) +
-      '<p class="script-md rv">' + esc(C.english) + '</p>' +
-      hi('hi-sign gap', C.signedHindi) +
-      p('en-sm', C.signedEnglish) +
+    var head = HI()
+      ? line('hi-title', C.title.hi) + line('hi-sign gap', C.signed.hi)
+      : '<p class="script-md rv">' + esc(C.title.en) + '</p>' + line('en-sm gap-sm', C.signed.en);
+    return head +
       '<div class="pills rv">' + calls + whatsapp + '</div>' +
-      '<button class="text-btn rv" id="replay" type="button">Watch again</button>';
+      '<button class="text-btn rv" id="replay" type="button">' + esc(T('replay')) + '</button>';
   }
 
-  var M = W.families.maternal;
-  var nanihal = p('en-sm gap-sm', M.label + ': ' + M.names);
+  function nanihal() { return line('en-sm gap-sm', L(W.families.maternal)); }
 
-  var PR = ART.props;
+  // The richer couple and peacock (figures.js) replace the simple ones when present.
+  var PR = Object.assign({}, ART.props, window.FIGURES ? { peacock: FIGURES.peacock, couple: FIGURES.couple } : {});
   var SLIDES = [
-    { id: 'save-the-date', label: 'Save the date', mood: 'day', box: [150, 270, 850, 905], html: sceneHero,
-      props: function () { return { arch: PR.peacock(200, 1566, 1.05, true) + PR.couple(560, 1552, 0.98) }; } },
-    { id: 'blessing', label: 'Shri Ganesh', mood: 'dawn', box: [180, 290, 820, 1130], html: sceneBlessing,
+    { id: 'save-the-date', mood: 'day', box: [150, 270, 850, 905], html: sceneHero,
+      props: function () { return { arch: PR.peacock(245, 1566, 1, true) + PR.couple(585, 1554, 0.98) }; } },
+    { id: 'blessing', mood: 'dawn', box: [180, 290, 820, 1130], html: sceneBlessing,
       props: function () { return { arch: PR.bells() }; } },
-    { id: 'invitation', label: 'Invitation', mood: 'day', box: [120, 350, 880, 1520], top: true, html: sceneInvitation,
+    { id: 'invitation', mood: 'day', box: [120, 350, 880, 1520], top: true, html: sceneInvitation,
       props: function () { return { arch: '' }; } },
-    { id: 'bride', label: "The bride's family", mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.bride, bride, nanihal); },
-      props: function () { return { arch: PR.peacock(205, 1566, 1, true) }; } },
-    { id: 'groom', label: "The groom's family", mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.groom, groom); },
-      props: function () { return { arch: PR.peacock(795, 1566, 1, false) }; } },
-    { id: 'day-1', label: '9 December', mood: 'morning', box: [185, 280, 815, 1060], html: function () { return sceneDay(W.days[0]); },
+    { id: 'bride', mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.bride, nanihal()); },
+      props: function () { return { arch: PR.peacock(250, 1566, 1, true) }; } },
+    { id: 'groom', mood: 'day', box: [140, 300, 860, 1130], html: function () { return sceneFamily(W.families.groom); },
+      props: function () { return { arch: PR.peacock(750, 1566, 1, false) }; } },
+    { id: 'day-1', mood: 'morning', box: [175, 280, 825, 1070], html: function () { return sceneDay(W.days[0]); },
       props: function () { return { arch: PR.marigolds() }; } },
-    { id: 'day-2', label: '11 December', mood: 'golden', box: [185, 300, 815, 1130], html: function () { return sceneDay(W.days[1]); },
-      props: function () { return { arch: PR.marigolds() + PR.peacock(205, 1566, 1, true) }; } },
-    { id: 'day-3', label: '12 December', mood: 'dusk', box: [185, 300, 815, 1130], html: function () { return sceneDay(W.days[2]); },
+    { id: 'day-2', mood: 'golden', box: [175, 300, 825, 1130], html: function () { return sceneDay(W.days[1]); },
+      props: function () { return { arch: PR.marigolds() + PR.peacock(250, 1566, 1, true) }; } },
+    { id: 'day-3', mood: 'dusk', box: [175, 300, 825, 1130], html: function () { return sceneDay(W.days[2]); },
       props: function () { return { glow: PR.lanterns() }; } },
-    { id: 'venue', label: 'Venue and countdown', mood: 'night', box: [170, 300, 830, 1130], html: sceneVenue,
+    { id: 'venue', mood: 'night', box: [170, 300, 830, 1130], html: sceneVenue,
       props: function () { return { glow: PR.lanterns() + PR.diyas() }; } },
-    { id: 'family', label: 'With love', mood: 'night', box: [170, 290, 830, 1190], html: sceneGreetings,
+    { id: 'family', mood: 'night', box: [170, 290, 830, 1190], html: sceneGreetings,
       props: function () { return { glow: PR.lanterns() + PR.diyas() }; } },
-    { id: 'rsvp', label: 'Awaiting you', mood: 'moon', box: [150, 392, 850, 990], html: sceneClosing,
-      props: function () { return { arch: PR.couple(520, 1552, 0.86), glow: PR.diyas([150, 250, 760, 860]) }; } },
+    { id: 'rsvp', mood: 'moon', box: [150, 392, 850, 990], html: sceneClosing,
+      props: function () { return { arch: PR.couple(505, 1556, 0.82), glow: PR.diyas([150, 250, 760, 860]) }; } },
   ];
   var N = SLIDES.length;
 
@@ -211,7 +249,7 @@
   var world = $('#world');
   var skyEl = $('#sky');
   var tintEl = $('#tint');
-  var crestEl = $('#crest');
+  var langBtns = $$('[data-set-lang]');
   var panelsEl = $('#panels');
   var progressEl = $('#progress');
   var cover = $('#cover');
@@ -230,7 +268,23 @@
   $('#l-arch').innerHTML = ART.arch();
   $('#l-stars').innerHTML = ART.stars();
   $('#l-glow').innerHTML = ART.glowLayer();
-  crestEl.innerHTML = ART.crest(bride.name, groom.name);
+  if (window.FIGURES) {
+    // Fabric, metal and peacock definitions, shared by the palace and the cover.
+    document.body.insertAdjacentHTML('afterbegin', '<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">' + FIGURES.defs() + '</svg>');
+    $$('.door', cover).forEach(function (d) { d.innerHTML = FIGURES.doors(); });
+    $('.toran', cover).innerHTML = FIGURES.toran();
+    $('.cover-flora', cover).innerHTML = FIGURES.flora();
+    // A few rose and marigold petals drifting down over the doors.
+    if (!reduced) {
+      var petals = '';
+      for (var pk = 0; pk < 14; pk++) {
+        petals += '<i class="petal' + (pk % 3 === 0 ? ' petal--gold' : '') + '" style="left:' + (Math.random() * 96).toFixed(1) + '%;--d:' + (9 + Math.random() * 7).toFixed(1) +
+          's;--delay:' + (Math.random() * 9).toFixed(1) + 's;--dx:' + Math.round(Math.random() * 90 - 45) + 'px;--s:' + (0.7 + Math.random() * 0.6).toFixed(2) + '"></i>';
+      }
+      $('.cover-petals', cover).innerHTML = petals;
+    }
+    $('.cover-crest', cover).innerHTML = FIGURES.crest(ART.ganesha(), [bride.en.charAt(0), groom.en.charAt(0)]);
+  }
 
   var MOVING = $$('.layer[data-p]').map(function (el) { return { el: el, p: parseFloat(el.dataset.p) }; });
   var FIXED = $$('.layer--fixed');
@@ -242,17 +296,41 @@
   $$('#l-arch .slot').forEach(function (g) { archSlots[g.getAttribute('data-slot')] = g; });
   $$('#l-glow .slot').forEach(function (g) { glowSlots[g.getAttribute('data-slot')] = g; });
 
-  panelsEl.innerHTML = SLIDES.map(function (s, i) {
-    var night = MOODS[s.mood].night;
-    return '<section class="panel' + (night ? ' is-night' : '') + (s.top ? ' panel--top' : '') + '" style="--l:' + s.box[0] + ';--t:' + s.box[1] + ';--r:' + s.box[2] + ';--b:' + s.box[3] + '"' +
-      ' role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' of ' + N + ': ' + esc(s.label) + '" aria-hidden="true">' +
-      s.html() + '</section>';
-  }).join('');
-  var panels = $$('.panel', panelsEl);
-  panels.forEach(function (el) {
-    $$('.rv', el).forEach(function (line, k) { line.style.setProperty('--i', k); });
-    el.inert = true;
-  });
+  // The words for every scene, in the chosen language. Rebuilt when the language changes.
+  var panels = [];
+  function renderPanels() {
+    var labels = T('labels');
+    panelsEl.innerHTML = SLIDES.map(function (s, i) {
+      var night = MOODS[s.mood].night;
+      return '<section class="panel' + (night ? ' is-night' : '') + (s.top ? ' panel--top' : '') + '" lang="' + LANG + '" style="--l:' + s.box[0] + ';--t:' + s.box[1] + ';--r:' + s.box[2] + ';--b:' + s.box[3] + '"' +
+        ' role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + N + ': ' + esc(labels[i]) + '" aria-hidden="true">' +
+        s.html() + '</section>';
+    }).join('');
+    panels = $$('.panel', panelsEl);
+    panels.forEach(function (el) {
+      $$('.rv', el).forEach(function (ln, k) { ln.style.setProperty('--i', k); });
+      el.inert = true;
+    });
+  }
+
+  function setLang(l, rerender) {
+    LANG = l === 'hi' ? 'hi' : 'en';
+    document.documentElement.lang = LANG;
+    story.classList.toggle('lang-hi', LANG === 'hi');
+    langBtns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === LANG ? 'true' : 'false'); });
+    $('span', hint).textContent = T('swipe');
+    if (!rerender) return;
+    if (pan) endPan();
+    renderPanels();
+    if (opened && !intro && cur >= 0) {
+      void panels[cur].offsetWidth;
+      setPanel(cur, 'active');
+      updateChrome(cur);
+    }
+    tick();
+  }
+
+  renderPanels();
 
   progressEl.innerHTML = SLIDES.map(function () { return '<span class="seg"><i></i></span>'; }).join('');
   var segs = $$('.seg', progressEl);
@@ -261,7 +339,7 @@
      Layout: map bay units to pixels for this screen
      ---------------------------------------------------------- */
   var U = 1, OX = 0, OY = 0, CW = 0, CH = 0, DPR = 1;
-  var ZOOM = 3.4, ZOOM_Y = 698;
+  var ZOOM = 1.25, ZOOM_Y = 698;
 
   function layout() {
     var r = story.getBoundingClientRect();
@@ -272,6 +350,7 @@
     story.style.setProperty('--u', U + 'px');
     story.style.setProperty('--ox', OX + 'px');
     story.style.setProperty('--oy', OY + 'px');
+    story.style.setProperty('--ch', CH + 'px');
     MOVING.forEach(function (L) {
       L.el.style.width = 3000 * U + 'px';
       L.el.style.height = 1900 * U + 'px';
@@ -347,7 +426,7 @@
     });
     void segs[i].offsetWidth;
     segs[i].classList.add('is-current');
-    statusEl.textContent = 'Step ' + (i + 1) + ' of ' + N + ': ' + SLIDES[i].label;
+    statusEl.textContent = T('step') + ' ' + (i + 1) + ' ' + T('of') + ' ' + N + ': ' + T('labels')[i];
     prevBtn.disabled = i === 0;
     nextBtn.disabled = i === N - 1;
     try { history.replaceState(null, '', '#' + SLIDES[i].id); } catch (e) { /* some in-app browsers block this */ }
@@ -437,11 +516,19 @@
   SLIDES.forEach(function (s, i) { if (location.hash === '#' + s.id) startIndex = i; });
 
   function setZoom(scale, animate) {
-    var tr = animate ? 'transform 2.9s cubic-bezier(.5, 0, .15, 1)' : 'none';
-    world.style.transition = tr;
-    crestEl.style.transition = animate ? tr + ', opacity 1.5s ease 0.7s' : 'none';
+    world.style.transition = animate ? 'transform 2.9s cubic-bezier(.5, 0, .15, 1)' : 'none';
     world.style.transform = 'scale(' + scale + ')';
-    crestEl.style.transform = 'scale(' + (scale / ZOOM) + ')';
+  }
+
+  // Opening the invitation: the words fade, the palace doors swing open, and the camera pulls back.
+  var opening = false;
+  function openCover() {
+    if (opening || opened) return;
+    opening = true;
+    story.classList.add('is-warm');
+    playMusic();
+    cover.classList.add('is-opening');
+    setTimeout(openInvite, reduced ? 0 : 700);
   }
 
   function openInvite() {
@@ -449,24 +536,21 @@
     opened = true;
     story.classList.add('is-open');
     document.body.classList.add('is-open');
-    playMusic();
     settle(startIndex, false);
     if (reduced) {
       setZoom(1, false);
-      crestEl.style.opacity = 0;
       setPanel(startIndex, 'active');
       return;
     }
     void world.offsetWidth;
     setZoom(1, true);
-    crestEl.style.opacity = 0;
     var t0 = performance.now();
     intro = { t0: t0, hero: startIndex === 0, timers: [] };
     if (intro.hero) {
       prepareWalk();
       startFlock(t0 + 1300);
-      intro.timers.push(setTimeout(function () { startWalk(); }, 4300));
-      intro.timers.push(setTimeout(revealHero, 6900));
+      intro.timers.push(setTimeout(function () { startWalk(); }, 3600));
+      intro.timers.push(setTimeout(revealHero, 7200));
     } else {
       intro.timers.push(setTimeout(revealHero, 2300));
     }
@@ -488,51 +572,63 @@
     revealHero();
   }
 
-  /* Couple walk */
+  /* The couple walks in, hand in hand: the groom's legs swing at the hip and her lehenga sways. */
   var walk = null;
   var WALK_FROM = 680;
 
   function coupleParts() {
     var g = $('#l-arch .slot[data-slot="0"] .couple');
     if (!g) return null;
+    function leg(sel) {
+      var el = $(sel, g);
+      return el ? { el: el, pivot: el.getAttribute('data-pivot'), base: parseFloat(el.getAttribute('data-base')) } : null;
+    }
+    var skirt = $('.skirt', g);
     return {
       g: g,
       body: $('.couple-body', g),
-      legF: $('.leg--f', g),
-      legB: $('.leg--b', g),
-      skirt: $('.skirt', g),
+      legF: leg('.leg--f'),
+      legB: leg('.leg--b'),
+      skirt: skirt,
+      waist: skirt ? parseFloat(skirt.getAttribute('data-waist')) : 0,
       base: g.getAttribute('transform'),
     };
   }
 
   function placeCouple(parts, dx, phase, amp) {
+    // A couple illustration (no moving legs) fades in and rises into place instead of walking.
+    if (!parts.legF) {
+      var p = 1 - dx / WALK_FROM;
+      parts.body.setAttribute('opacity', p.toFixed(3));
+      parts.body.setAttribute('transform', 'translate(0 ' + ((1 - p) * 30).toFixed(2) + ')');
+      return;
+    }
     var m = /translate\(([-\d.]+) ([-\d.]+)\) scale\(([-\d.]+)\)/.exec(parts.base);
     var x = parseFloat(m[1]) + dx, y = parseFloat(m[2]), sc = m[3];
     parts.g.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y + ') scale(' + sc + ')');
-    var swing = Math.sin(phase) * 15 * amp;
-    parts.legF.setAttribute('transform', 'rotate(' + swing.toFixed(2) + ' 72 -330)');
-    parts.legB.setAttribute('transform', 'rotate(' + (-swing).toFixed(2) + ' 78 -330)');
-    parts.body.setAttribute('transform', 'translate(0 ' + (-Math.abs(Math.sin(phase)) * 6 * amp).toFixed(2) + ')');
-    parts.skirt.setAttribute('transform', 'skewX(' + (Math.sin(phase) * 2.6 * amp).toFixed(2) + ')');
+    var swing = Math.sin(phase) * 13 * amp;
+    if (parts.legF) parts.legF.el.setAttribute('transform', 'rotate(' + (parts.legF.base * (1 - amp) + swing).toFixed(2) + ' ' + parts.legF.pivot + ')');
+    if (parts.legB) parts.legB.el.setAttribute('transform', 'rotate(' + (parts.legB.base * (1 - amp) - swing).toFixed(2) + ' ' + parts.legB.pivot + ')');
+    parts.body.setAttribute('transform', 'translate(0 ' + (-Math.abs(Math.sin(phase)) * 5 * amp).toFixed(2) + ')');
+    if (parts.skirt) parts.skirt.setAttribute('transform', 'translate(0 ' + parts.waist + ') skewX(' + (Math.sin(phase) * 2.4 * amp).toFixed(2) + ') translate(0 ' + (-parts.waist) + ')');
   }
 
   function prepareWalk() {
     var parts = coupleParts();
     if (!parts) return;
     walk = { parts: parts, done: false };
-    placeCouple(parts, WALK_FROM, 0, 0);
+    placeCouple(parts, WALK_FROM, 0, 1);
   }
 
   function startWalk() {
     if (!walk) return;
-    var t0 = performance.now(), dur = 3900;
+    var t0 = performance.now(), dur = walk.parts.legF ? 3900 : 2000;
     function tick(now) {
       if (!walk || walk.done) return;
       var t = clamp((now - t0) / dur);
-      var e = 1 - Math.pow(1 - t, 1.7);
+      var e = walk.parts.legF ? 1 - Math.pow(1 - t, 1.7) : easeOut(t);
       var dist = WALK_FROM * (1 - e);
-      var phase = (WALK_FROM - dist) / 34;
-      placeCouple(walk.parts, dist, phase, t < 0.86 ? 1 : (1 - t) / 0.14);
+      placeCouple(walk.parts, dist, (WALK_FROM - dist) / 34, t < 0.86 ? 1 : (1 - t) / 0.14);
       if (t < 1) walk.raf = requestAnimationFrame(tick);
       else finishWalk();
     }
@@ -643,19 +739,30 @@
     musicBtn.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
   }
 
-  try {
-    audio = new Audio(W.music.src);
-    audio.loop = true;
-    audio.preload = 'auto';
-    audio.volume = 0.55;
-    audio.addEventListener('error', function () { audio = null; musicBtn.hidden = true; });
-    audio.addEventListener('play', function () { setMusicUI(true); });
-    audio.addEventListener('pause', function () { setMusicUI(false); });
-    musicBtn.hidden = false;
-  } catch (e) {
-    audio = null;
-    musicBtn.hidden = true;
+  // The first track in the list that loads is used, so a song added later takes over from the default.
+  var tracks = [].concat(W.music.src);
+  function loadTrack(i) {
+    try {
+      var a = new Audio(tracks[i]);
+      a.loop = true;
+      a.preload = 'auto';
+      a.volume = 0.55;
+      a.addEventListener('error', function () {
+        if (audio !== a) return;
+        var resume = wasPlaying || !a.paused;
+        if (i + 1 < tracks.length) { loadTrack(i + 1); if (resume) playMusic(); }
+        else { audio = null; musicBtn.hidden = true; }
+      });
+      a.addEventListener('play', function () { setMusicUI(true); });
+      a.addEventListener('pause', function () { setMusicUI(false); });
+      audio = a;
+      musicBtn.hidden = false;
+    } catch (e) {
+      audio = null;
+      musicBtn.hidden = true;
+    }
   }
+  loadTrack(0);
 
   function playMusic() {
     if (!audio) return;
@@ -720,8 +827,8 @@
           'DTSTAMP:' + now,
           'DTSTART:' + icsStamp(start),
           'DTEND:' + icsStamp(end),
-          'SUMMARY:' + icsText(bride.name + ' & ' + groom.name + ': ' + ev.english),
-          'LOCATION:' + icsText(day.place),
+          'SUMMARY:' + icsText(bride.en + ' & ' + groom.en + ': ' + ev.name.en),
+          'LOCATION:' + icsText(day.place.en),
           'DESCRIPTION:' + icsText('Shubh Vivah wedding celebration. All times IST.'),
           'END:VEVENT'
         );
@@ -746,7 +853,10 @@
   /* ----------------------------------------------------------
      Input
      ---------------------------------------------------------- */
-  $('#open').addEventListener('click', openInvite);
+  $('#open').addEventListener('click', openCover);
+  langBtns.forEach(function (b) {
+    b.addEventListener('click', function () { if (b.getAttribute('data-set-lang') !== LANG) setLang(b.getAttribute('data-set-lang'), true); });
+  });
   prevBtn.addEventListener('click', function () { step(-1); });
   nextBtn.addEventListener('click', function () { step(1); });
 
@@ -789,7 +899,7 @@
 
   document.addEventListener('keydown', function (e) {
     if (!opened) {
-      if (e.key === 'Enter' && document.activeElement === document.body) openInvite();
+      if (e.key === 'Enter' && document.activeElement === document.body) openCover();
       return;
     }
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); step(1); }
@@ -801,7 +911,10 @@
   /* ----------------------------------------------------------
      Start on the cover
      ---------------------------------------------------------- */
+  setLang(LANG, false);
   layout();
+  // Paint the palace behind the doors once the cover has appeared.
+  setTimeout(function () { story.classList.add('is-warm'); }, 2600);
   applyMood(SLIDES[startIndex].mood);
   setZoom(ZOOM, false);
   tick();
