@@ -320,10 +320,11 @@
     document.documentElement.lang = LANG;
     story.classList.toggle('lang-hi', LANG === 'hi');
     langBtns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === LANG ? 'true' : 'false'); });
-    $('span', hint).textContent = T('swipe');
+    $('.hint-text', hint).textContent = T('swipe');
     if (autoBtn) autoBtn.setAttribute('aria-label', T(autoOn ? 'autoPause' : 'autoPlay'));
     if (!rerender) return;
     if (pan) endPan();
+    stopPeek();
     renderPanels();
     if (opened && !intro && cur >= 0) {
       void panels[cur].offsetWidth;
@@ -373,6 +374,7 @@
     canvas.width = Math.round(CW * DPR);
     canvas.height = Math.round(CH * DPR);
     if (pan) renderPan(pan.e);
+    else if (peek) renderPan(peek.e, peek);
   }
 
   /* ----------------------------------------------------------
@@ -448,7 +450,62 @@
     panels.forEach(function (el, k) { if (k !== i) setPanel(k, 'off'); });
     if (showText !== false) setPanel(i, 'active');
     updateChrome(i);
-    if (showText !== false) startTimer(i);
+    if (showText !== false) { startTimer(i); cueNext(i); }
+  }
+
+  /* ----------------------------------------------------------
+     Swipe cue. Every scene but the last shows a hand swiping at the
+     bottom, and until the guest swipes for themselves the camera peeks
+     toward the next arch and springs back, so the palace reads as
+     something that moves sideways.
+     ---------------------------------------------------------- */
+  var FILM = /[?&]film\b/.test(location.search); // a clean take for recording the video
+  var cueTimers = [];
+  var peek = null;
+  var PEEK = 0.07, PEEK_MS = 1500;
+
+  function clearCue() {
+    cueTimers.forEach(clearTimeout);
+    cueTimers = [];
+    hint.classList.remove('is-on');
+    stopPeek();
+  }
+
+  function cueNext(i) {
+    clearCue();
+    if (FILM || !opened || i >= N - 1) return;
+    cueTimers.push(setTimeout(function () { hint.classList.add('is-on'); }, 1600));
+    if (!moved && !reduced) cueTimers.push(setTimeout(startPeek, 2800));
+  }
+
+  function startPeek() {
+    if (pan || intro || peek || moved || cur >= N - 1) return;
+    fillSlot('1', cur + 1);
+    peek = { from: cur, to: cur + 1, dir: 1, t0: performance.now(), e: 0 };
+    peek.raf = requestAnimationFrame(peekFrame);
+  }
+
+  function peekFrame(now) {
+    if (!peek) return;
+    var t = clamp((now - peek.t0) / PEEK_MS);
+    // Out briskly, then ease back home.
+    peek.e = PEEK * (t < 0.35 ? easeOut(t / 0.35) : 1 - easeInOut((t - 0.35) / 0.65));
+    renderPan(peek.e, peek);
+    if (t < 1) peek.raf = requestAnimationFrame(peekFrame);
+    else stopPeek();
+  }
+
+  function stopPeek() {
+    if (!peek) return;
+    cancelAnimationFrame(peek.raf);
+    var p = peek;
+    peek = null;
+    MOVING.forEach(function (L) { L.el.style.transform = ''; });
+    skyClip.removeAttribute('transform');
+    applyMood(SLIDES[p.from].mood);
+    if (panels[p.from]) { panels[p.from].style.transform = ''; panels[p.from].style.opacity = '1'; }
+    if (panels[p.to]) { panels[p.to].style.transform = ''; panels[p.to].style.opacity = ''; }
+    fillSlot('1', -1);
   }
 
   /* ----------------------------------------------------------
@@ -488,15 +545,16 @@
     go(cur + 1);
   });
 
-  function renderPan(e) {
-    var off = -pan.dir * e * 1000;
+  function renderPan(e, p) {
+    p = p || pan;
+    var off = -p.dir * e * 1000;
     MOVING.forEach(function (L) { L.el.style.transform = 'translate3d(' + (off * L.p * U) + 'px,0,0)'; });
     skyClip.setAttribute('transform', 'translate(' + off + ' 0)');
-    applyMood(SLIDES[pan.from].mood, SLIDES[pan.to].mood, e);
-    var out = panels[pan.from], inn = panels[pan.to];
+    applyMood(SLIDES[p.from].mood, SLIDES[p.to].mood, e);
+    var out = panels[p.from], inn = panels[p.to];
     out.style.transform = 'translate3d(' + (off * U) + 'px,0,0)';
     out.style.opacity = clamp(1 - e * 2.6);
-    inn.style.transform = 'translate3d(' + ((off + pan.dir * 1000) * U) + 'px,0,0)';
+    inn.style.transform = 'translate3d(' + ((off + p.dir * 1000) * U) + 'px,0,0)';
     inn.style.opacity = clamp((e - 0.35) / 0.5);
   }
 
@@ -525,6 +583,7 @@
     if (i < 0 || i >= N || i === cur) return;
     if (pan) endPan();
     if (intro) finishIntro();
+    clearCue();
     if (cur < 0 || reduced) { settle(i); return; }
     var dir = i > cur ? 1 : -1;
     fillSlot(String(dir), i);
@@ -605,7 +664,7 @@
     intro = null;
     setPanel(cur, 'active');
     startTimer(cur);
-    if (!moved && cur === 0) setTimeout(function () { if (!moved && cur === 0) hint.classList.add('is-on'); }, 2600);
+    cueNext(cur);
   }
 
   function finishIntro() {
@@ -928,6 +987,7 @@
     tracking = true;
     sx = e.clientX; sy = e.clientY; st = Date.now();
     story.classList.add('auto-hold');
+    stopPeek();
   });
   window.addEventListener('pointerup', function () { story.classList.remove('auto-hold'); });
   window.addEventListener('pointercancel', function () { story.classList.remove('auto-hold'); });

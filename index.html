@@ -103,9 +103,20 @@
       </div>
     </header>
 
+    <!-- Shown on every scene but the last: a hand swiping to the left. -->
     <p class="hint" id="hint" aria-hidden="true">
-      <span>Swipe to continue</span>
-      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="hint-track">
+        <svg class="hint-hand" viewBox="0 0 24 24" width="24" height="24">
+          <g fill="currentColor">
+            <rect x="8.6" y="1.6" width="3.6" height="12.4" rx="1.8"></rect>
+            <rect x="12" y="7.4" width="3.4" height="7.6" rx="1.7"></rect>
+            <rect x="15.2" y="8.6" width="3.2" height="6.8" rx="1.6"></rect>
+            <rect x="18.1" y="10" width="2.9" height="5.8" rx="1.45"></rect>
+            <path d="M8.6 12H21v4.4c0 3.3-2.5 6-5.7 6h-2.2c-1.9 0-3.6-1-4.6-2.6l-4-5.3c-.6-.8-.4-1.8.4-2.3.8-.5 1.8-.3 2.3.5l1.4 1.9z"></path>
+          </g>
+        </svg>
+      </span>
+      <span class="hint-text">Swipe to continue</span>
     </p>
 
     <p class="sr-only" id="status" aria-live="polite"></p>
