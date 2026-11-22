@@ -25,8 +25,10 @@ window.WEDDING = {
     // The first file that exists is played. Put your own song at assets/music/song.mp3 and it
     // replaces the default tune; until then the default plays.
     src: ["assets/music/song.mp3", "assets/music/wedding-theme.wav"],
-    // Seconds to skip at the start of the song (and on each loop), because the song opens silent.
-    startAt: 1.5,
+    // The song opens and ends in silence. Playback starts at startAt seconds, so the music comes in
+    // just as the doors finish opening, and jumps back there from endAt instead of playing the silent end.
+    startAt: 3.6,
+    endAt: 117,
   },
 
   blessing: {

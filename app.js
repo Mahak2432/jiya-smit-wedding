@@ -785,10 +785,12 @@
 
   // The first track in the list that loads is used, so a song added later takes over from the default.
   var tracks = [].concat(W.music.src);
-  var startAt = W.music.startAt || 0;
-  // Jump past the silent opening, both on first play and each time the loop wraps back to 0.
+  var startAt = W.music.startAt || 0, endAt = W.music.endAt || 0;
+  // Skip the song's silent opening and silent ending: start at startAt, and loop back there from endAt.
   function skipIntro(a) {
-    if (startAt && a.duration > startAt && a.currentTime < startAt - 0.05) a.currentTime = startAt;
+    if (!(a.duration > startAt)) return;
+    if (startAt && a.currentTime < startAt - 0.05) a.currentTime = startAt;
+    else if (endAt > startAt && a.currentTime >= endAt) a.currentTime = startAt;
   }
   function loadTrack(i) {
     try {
